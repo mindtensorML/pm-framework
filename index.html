@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Construction Framework v3</title>
+    <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: #f0f2f5; color: #1e293b; line-height: 1.6; }
+
+    .hero {
+        background: linear-gradient(145deg, #0f172a 0%, #1e3a5f 45%, #1a4a6e 100%);
+        color: #fff; padding: 52px 24px 40px; text-align: center;
+        border-bottom: 3px solid #f59e0b;
+    }
+    .hero h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
+    .hero .subtitle { font-size: 1.05rem; opacity: 0.85; margin-bottom: 28px; font-weight: 400; }
+    .stat-boxes { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin-bottom: 28px; }
+    .stat-box {
+        background: rgba(255,255,255,0.08); border-radius: 10px; padding: 14px 22px;
+        min-width: 110px; border: 1px solid rgba(255,255,255,0.12);
+    }
+    .stat-box .num { font-size: 1.9rem; font-weight: 700; display: block; color: #f59e0b; }
+    .stat-box .label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.2px; opacity: 0.75; }
+
+    .stacked-bar-container { max-width: 680px; margin: 0 auto 24px; }
+    .stacked-bar-container h3 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 8px; opacity: 0.8; }
+    .stacked-bar { display: flex; border-radius: 6px; overflow: hidden; height: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .stacked-bar .seg { display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 600; color: #1e293b; white-space: nowrap; }
+    .bar-legend { display: flex; justify-content: center; gap: 18px; margin-top: 10px; font-size: 0.76rem; flex-wrap: wrap; }
+    .bar-legend span { display: flex; align-items: center; gap: 5px; }
+    .bar-legend .dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+
+    .tab-bar {
+        position: sticky; top: 0; z-index: 100; background: #fff;
+        border-bottom: 2px solid #e2e8f0; display: flex; overflow-x: auto;
+        padding: 0 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .tab-bar::-webkit-scrollbar { height: 3px; }
+    .tab-bar::-webkit-scrollbar-thumb { background: #0f172a; border-radius: 2px; }
+    .tab-btn {
+        background: none; border: none; padding: 13px 18px; font-size: 0.85rem;
+        font-weight: 500; color: #64748b; cursor: pointer; white-space: nowrap;
+        border-bottom: 3px solid transparent; transition: all 0.2s; font-family: inherit;
+    }
+    .tab-btn:hover { color: #0f172a; background: #f8fafc; }
+    .tab-btn.active { color: #0f172a; border-bottom-color: #f59e0b; font-weight: 600; }
+
+    .tab-content { display: none; padding: 24px; max-width: 1300px; margin: 0 auto; }
+    .tab-content.active { display: block; }
+
+    .card {
+        background: #fff; border-radius: 10px; padding: 24px;
+        box-shadow: 0 1px 8px rgba(0,0,0,0.06); margin-bottom: 20px;
+    }
+    .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+    .card-header h2 { font-size: 1.25rem; color: #0f172a; font-weight: 600; }
+    .badge { padding: 3px 10px; border-radius: 16px; font-size: 0.72rem; font-weight: 600; color: #fff; }
+    .badge-blue { background: #2563eb; }
+    .badge-amber { background: #d97706; }
+    .badge-green { background: #16a34a; }
+    .badge-purple { background: #7c3aed; }
+    .badge-red { background: #dc2626; }
+
+    .diagram-wrapper {
+        border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px;
+        overflow-x: auto; background: #fafbfc; min-height: 120px;
+    }
+    .diagram-wrapper svg { max-width: none !important; }
+    .diagram-actions { display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end; }
+    .btn {
+        padding: 7px 14px; border-radius: 6px; border: 1px solid #d1d5db;
+        background: #fff; color: #374151; cursor: pointer; font-size: 0.8rem;
+        font-family: inherit; transition: all 0.15s; display: inline-flex; align-items: center; gap: 5px;
+    }
+    .btn:hover { background: #f8fafc; border-color: #2563eb; color: #1e40af; }
+
+    .note-box {
+        background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px;
+        padding: 14px 18px; margin-top: 16px; font-size: 0.85rem; color: #92400e;
+    }
+    .note-box strong { color: #78350f; }
+
+    .legend-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .legend-card { padding: 18px; }
+    .legend-card h4 { font-size: 0.88rem; color: #0f172a; margin-bottom: 12px; font-weight: 600; }
+    .legend-item { display: flex; align-items: center; gap: 10px; padding: 5px 0; font-size: 0.82rem; }
+    .legend-swatch { width: 28px; height: 18px; border-radius: 3px; border: 1px solid #ccc; flex-shrink: 0; }
+
+    .lightbox {
+        display: none; position: fixed; inset: 0; z-index: 1000;
+        background: rgba(0,0,0,0.88); justify-content: center; align-items: center; flex-direction: column;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox-controls { position: absolute; top: 16px; right: 16px; display: flex; gap: 8px; z-index: 1001; }
+    .lightbox-controls button {
+        width: 38px; height: 38px; border-radius: 50%; border: none;
+        background: rgba(255,255,255,0.15); color: #fff; font-size: 1.1rem;
+        cursor: pointer; transition: background 0.2s;
+    }
+    .lightbox-controls button:hover { background: rgba(255,255,255,0.3); }
+    .lightbox-canvas { overflow: auto; max-width: 95vw; max-height: 90vh; cursor: grab; border-radius: 8px; }
+    .lightbox-canvas:active { cursor: grabbing; }
+    .lightbox-canvas svg { background: #fff; border-radius: 8px; display: block; }
+    .lightbox-zoom-info {
+        position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+        background: rgba(0,0,0,0.5); color: #fff; padding: 5px 12px; border-radius: 16px; font-size: 0.78rem;
+    }
+
+    .footer { text-align: center; padding: 20px; color: #94a3b8; font-size: 0.78rem; border-top: 1px solid #e2e8f0; margin-top: 28px; background: #fff; }
+
+    .mermaid-error { padding: 16px; color: #dc2626; font-size: 0.85rem; font-family: 'Courier New', Courier, monospace; }
+    .mermaid-source { padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-family: 'Courier New', Courier, monospace; font-size: 0.75rem; line-height: 1.5; white-space: pre-wrap; word-break: break-word; color: #475569; max-height: 400px; overflow-y: auto; }
+    .mermaid-source-label { font-size: 0.72rem; color: #94a3b8; margin-bottom: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .diagram-loading { padding: 40px; text-align: center; color: #94a3b8; font-size: 0.85rem; }
+
+    @media (max-width: 768px) {
+        .hero { padding: 28px 16px 24px; }
+        .hero h1 { font-size: 1.4rem; }
+        .stat-boxes { gap: 8px; }
+        .stat-box { min-width: 80px; padding: 10px 12px; }
+        .stat-box .num { font-size: 1.4rem; }
+        .tab-btn { padding: 11px 12px; font-size: 0.8rem; }
+        .tab-content { padding: 14px; }
+        .card { padding: 16px; }
+        .summary-grid, .legend-grid { grid-template-columns: 1fr; }
+    }
+    </style>
+</head>
+<body>
+
+<section class="hero">
+    <h1>Portfolio Construction Framework v3</h1>
+    <p class="subtitle">H1: Universal Process &nbsp;|&nbsp; H2: Full Sub-Step Expansion</p>
+    <div class="stat-boxes">
+        <div class="stat-box"><span class="num">7</span><span class="label">Steps</span></div>
+        <div class="stat-box"><span class="num">5</span><span class="label">Obj. Routes</span></div>
+        <div class="stat-box"><span class="num">3</span><span class="label">Method Routes</span></div>
+        <div class="stat-box"><span class="num">3</span><span class="label">Feedback Tiers</span></div>
+    </div>
+    <div class="stacked-bar-container">
+        <h3>Sub-Steps by Step</h3>
+        <div class="stacked-bar">
+            <div class="seg" style="width:18%;background:#bfdbfe">S1: 6</div>
+            <div class="seg" style="width:18%;background:#bbf7d0">S2: 6</div>
+            <div class="seg" style="width:15%;background:#fef08a">S3: 5</div>
+            <div class="seg" style="width:12%;background:#fecaca">S4: 4</div>
+            <div class="seg" style="width:15%;background:#e9d5ff">S5: 5</div>
+            <div class="seg" style="width:12%;background:#fed7aa">S6: 4</div>
+            <div class="seg" style="width:15%;background:#e2e8f0">S7: 5</div>
+        </div>
+        <div class="bar-legend">
+            <span><span class="dot" style="background:#bfdbfe"></span>Define Purpose</span>
+            <span><span class="dot" style="background:#bbf7d0"></span>Define Rules</span>
+            <span><span class="dot" style="background:#fef08a"></span>Map Universe</span>
+            <span><span class="dot" style="background:#fecaca"></span>Methodology</span>
+            <span><span class="dot" style="background:#e9d5ff"></span>Construct</span>
+            <span><span class="dot" style="background:#fed7aa"></span>Execute</span>
+            <span><span class="dot" style="background:#e2e8f0"></span>Monitor</span>
+        </div>
+    </div>
+</section>
+
+<nav class="tab-bar">
+    <button class="tab-btn active" data-tab="tab-overview">Overview</button>
+    <button class="tab-btn" data-tab="tab-s1">1. Purpose</button>
+    <button class="tab-btn" data-tab="tab-s2">2. Rules</button>
+    <button class="tab-btn" data-tab="tab-s3">3. Universe</button>
+    <button class="tab-btn" data-tab="tab-s4">4. Methodology</button>
+    <button class="tab-btn" data-tab="tab-s5">5. Construct</button>
+    <button class="tab-btn" data-tab="tab-s6">6. Execute</button>
+    <button class="tab-btn" data-tab="tab-s7">7. Monitor</button>
+    <button class="tab-btn" data-tab="tab-legend">Legend</button>
+</nav>
+
+<!-- OVERVIEW -->
+<div class="tab-content active" id="tab-overview">
+    <div class="card">
+        <div class="card-header">
+            <h2>H2 v3: Full Structural Logic</h2>
+            <span class="badge badge-blue">7 Steps</span>
+            <span class="badge badge-amber">2 Decision Nodes</span>
+            <span class="badge badge-red">3 Feedback Loops</span>
+        </div>
+        <div class="diagram-wrapper" id="dw-overview"></div>
+        <div class="diagram-actions">
+            <button class="btn" onclick="openLightbox('dw-overview')">&#x26F6; Fullscreen</button>
+            <button class="btn" onclick="copySource(0)">&#x2398; Copy Mermaid</button>
+        </div>
+    </div>
+</div>
+
+<!-- STEP 1 -->
+<div class="tab-content" id="tab-s1">
+    <div class="card">
+        <div class="card-header">
+            <h2>Step 1: Define Purpose</h2>
+            <span class="badge badge-blue">Universal</span>
+            <span class="badge badge-green">6 Sub-Steps</span>
+        </div>
+        <div class="diagram-wrapper" id="dw-s1"></div>
+        <div class="diagram-actions">
+            <button class="btn" onclick="openLightbox('dw-s1')">&#x26F6; Fullscreen</button>
+            <button class="btn" onclick="copySource(1)">&#x2398; Copy Mermaid</button>
+        </div>
+    </div>
+</div>
+
+<!-- STEP 2 -->
+<div class="tab-content" id="tab-s2">
+    <div class="card">
+        <div class="card-header">
+            <h2>Step 2: Define Rules</h2>
+            <span class="badge badge-amber">Decision Node 2.0</span>
+            <span class="badge badge-green">5 Routes</span>
+        </div>
+        <div class="diagram-wrapper" id="dw-s2"></div>
+        <div class="diagram-actions">
+            <button class="btn" onclick="openLightbox('dw-s2')">&#x26F6; Fullscreen</button>
+            <button class="btn" onclick="copySource(2)">&#x2398; Copy Mermaid</button>
+        </div>
+    </div>
+</div>
+
+<!-- STEP 3 -->
+<div class="tab-content" id="tab-s3">
+    <div class="card">
+        <div class="card-header">
+            <h2>Step 3: Map Opportunity Set</h2>
+            <span class="badge badge-blue">Universal</span>
+            <span class="badge badge-green">5 Sub-Steps</span>
+        </div>
+        <div class="diagram-wrapper" id="dw-s3"></div>
+        <div class="diagram-actions">
+            <button class="btn" onclick="openLightbox('dw-s3')">&#x26F6; Fullscreen</button>
+            <button class="btn" onclick="copySource(3)">&#x2398; Copy Mermaid</button>
+        </div>
+    </div>
+</div>
+
+<!-- STEP 4 -->
+<div class="tab-content" id="tab-s4">
+    <div class="card">
+        <div class="card-header">
+            <h2>Step 4: Selection/Allocation Methodology</h2>
+            <span class="badge badge-amber">Decision Node 4.0</span>
+            <span class="badge badge-purple">Sleeve-Level Routing</span>
+        </div>
+        <div class="diagram-wrapper" id="dw-s4"></div>
+        <div class="diagram-actions">
+            <button class="btn" onclick="openLightbox('dw-s4')">&#x26F6; Fullscreen</button>
+            <button class="btn" onclick="copySource(4)">&#x2398; Copy Mermaid</button>
+        </div>
+    </div>
+</div>
+
+<!-- STEP 5 -->
+<div class="tab-content" id="tab-s5">
+    <div class="card">
+        <div class="card-header">
+            <h2>Step 5: Construct Portfolio</h2>
+            <span class="badge badge-blue">Universal</span>
+            <span class="badge badge-purple">3 Construction Modes</span>
+        </div>
+        <div class="diagram-wrapper" id="dw-s5"></div>
+        <div class="diagram-actions">
+            <button class="btn" onclick="openLightbox('dw-s5')">&#x26F6; Fullscreen</button>
+            <button class="btn" onclick="copySource(5)">&#x2398; Copy Mermaid</button>
+        </div>
+    </div>
+</div>
+
+<!-- STEP 6 -->
+<div class="tab-content" id="tab-s6">
+    <div class="card">
+        <div class="card-header">
+            <h2>Step 6: Execute</h2>
+            <span class="badge badge-blue">Universal</span>
+            <span class="badge badge-green">4 Sub-Steps</span>
+        </div>
+        <div class="diagram-wrapper" id="dw-s6"></div>
+        <div class="diagram-actions">
+            <button class="btn" onclick="openLightbox('dw-s6')">&#x26F6; Fullscreen</button>
+            <button class="btn" onclick="copySource(6)">&#x2398; Copy Mermaid</button>
+        </div>
+    </div>
+</div>
+
+<!-- STEP 7 -->
+<div class="tab-content" id="tab-s7">
+    <div class="card">
+        <div class="card-header">
+            <h2>Step 7: Monitor and Adapt</h2>
+            <span class="badge badge-blue">Universal</span>
+            <span class="badge badge-red">3 Feedback Tiers</span>
+        </div>
+        <div class="diagram-wrapper" id="dw-s7"></div>
+        <div class="diagram-actions">
+            <button class="btn" onclick="openLightbox('dw-s7')">&#x26F6; Fullscreen</button>
+            <button class="btn" onclick="copySource(7)">&#x2398; Copy Mermaid</button>
+        </div>
+    </div>
+</div>
+
+<!-- LEGEND -->
+<div class="tab-content" id="tab-legend">
+    <div class="card">
+        <div class="card-header"><h2>Flowchart Legend</h2></div>
+        <div class="legend-grid">
+            <div class="legend-card card">
+                <h4>Node Types</h4>
+                <div class="legend-item"><div class="legend-swatch" style="background:#e0ecff;border-color:#2563eb"></div>Process Step</div>
+                <div class="legend-item"><div class="legend-swatch" style="background:#fef3c7;border-color:#d97706"></div>Decision Node</div>
+                <div class="legend-item"><div class="legend-swatch" style="background:#d1fae5;border-color:#16a34a"></div>Output / Document</div>
+                <div class="legend-item"><div class="legend-swatch" style="background:#fecaca;border-color:#dc2626"></div>Route E Path</div>
+                <div class="legend-item"><div class="legend-swatch" style="background:#ede9fe;border-color:#7c3aed"></div>Sub-Expansion</div>
+                <div class="legend-item"><div class="legend-swatch" style="background:#1e293b;border-color:#475569"></div>Terminal</div>
+            </div>
+            <div class="legend-card card">
+                <h4>Decision Nodes</h4>
+                <div class="legend-item"><strong>DN 2.0</strong> : Classify objective type, Routes A/B/C/D/E</div>
+                <div class="legend-item"><strong>Route E Check</strong> : Skip Steps 4 and 5 if non-financial hold</div>
+                <div class="legend-item"><strong>DN 4.0</strong> : Classify methodology, Routes X/Y/Z per sleeve</div>
+                <div class="legend-item"><strong>Step 7.4</strong> : Three-tier feedback decision</div>
+            </div>
+            <div class="legend-card card">
+                <h4>Edge Types</h4>
+                <div class="legend-item">Solid arrow : primary flow</div>
+                <div class="legend-item">Dotted arrow : feedback loop or conditional sub-expansion</div>
+                <div class="legend-item">Labeled edge : output document or route classification</div>
+            </div>
+            <div class="legend-card card">
+                <h4>Feedback Tiers from Step 7.4</h4>
+                <div class="legend-item"><strong>Routine</strong> : Rebalance, back to Step 5 or 6</div>
+                <div class="legend-item"><strong>Significant</strong> : Strategy change, back to Step 4</div>
+                <div class="legend-item"><strong>Fundamental</strong> : Mandate review, back to Step 1</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+    <div class="lightbox-controls">
+        <button onclick="lbZoom(0.2)" title="Zoom in">+</button>
+        <button onclick="lbZoom(-0.2)" title="Zoom out">&#x2212;</button>
+        <button onclick="closeLightbox()" title="Close">&#x2715;</button>
+    </div>
+    <div class="lightbox-canvas" id="lightbox-canvas"></div>
+    <div class="lightbox-zoom-info" id="zoom-info">1.0x</div>
+</div>
+
+<footer class="footer">
+    Portfolio Construction Framework v3 : 7 Steps, H2 Full Sub-Step Expansion
+</footer>
+
+
+<script>
+/* ============================================
+   BLOCK 1: TAB SWITCHING (zero dependencies)
+   ============================================ */
+(function() {
+    try {
+        var btns = document.querySelectorAll('.tab-btn');
+        var tabs = document.querySelectorAll('.tab-content');
+        btns.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                btns.forEach(function(b) { b.classList.remove('active'); });
+                tabs.forEach(function(t) { t.classList.remove('active'); });
+                btn.classList.add('active');
+                var target = document.getElementById(btn.getAttribute('data-tab'));
+                if (target) target.classList.add('active');
+            });
+        });
+    } catch(e) { console.error('Tab init error:', e); }
+})();
+
+/* ============================================
+   BLOCK 2: LIGHTBOX (zero dependencies)
+   ============================================ */
+var currentZoom = 1;
+function openLightbox(wrapperId) {
+    try {
+        var wrapper = document.getElementById(wrapperId);
+        if (!wrapper) return;
+        var svg = wrapper.querySelector('svg');
+        if (!svg) { alert('Diagram not rendered. Open in a browser with internet access for Mermaid CDN.'); return; }
+        var lb = document.getElementById('lightbox');
+        var canvas = document.getElementById('lightbox-canvas');
+        var clone = svg.cloneNode(true);
+        clone.style.background = '#fff';
+        clone.style.borderRadius = '8px';
+        clone.style.display = 'block';
+        clone.style.maxWidth = 'none';
+        canvas.innerHTML = '';
+        canvas.appendChild(clone);
+        currentZoom = 1;
+        document.getElementById('zoom-info').textContent = '1.0x';
+        lb.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    } catch(e) { console.error('Lightbox error:', e); }
+}
+function closeLightbox() {
+    try {
+        document.getElementById('lightbox').classList.remove('open');
+        document.body.style.overflow = '';
+        document.getElementById('lightbox-canvas').innerHTML = '';
+    } catch(e) {}
+}
+function lbZoom(delta) {
+    try {
+        currentZoom = Math.max(0.3, Math.min(4, currentZoom + delta));
+        var svg = document.getElementById('lightbox-canvas').querySelector('svg');
+        if (svg) {
+            svg.style.transform = 'scale(' + currentZoom + ')';
+            svg.style.transformOrigin = 'top left';
+        }
+        document.getElementById('zoom-info').textContent = currentZoom.toFixed(1) + 'x';
+    } catch(e) {}
+}
+(function() {
+    try {
+        var canvas = document.getElementById('lightbox-canvas');
+        canvas.addEventListener('wheel', function(e) {
+            if (!document.getElementById('lightbox').classList.contains('open')) return;
+            e.preventDefault();
+            lbZoom(e.deltaY < 0 ? 0.2 : -0.2);
+        }, { passive: false });
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeLightbox(); });
+        document.getElementById('lightbox').addEventListener('click', function(e) { if (e.target === document.getElementById('lightbox')) closeLightbox(); });
+    } catch(e) { console.error('Lightbox listeners error:', e); }
+})();
+
+/* ============================================
+   BLOCK 3: MERMAID SOURCES (data only)
+   ============================================ */
+var mmdSources = [];
+
+mmdSources[0] = [
+    'flowchart TD',
+    '    classDef process fill:#e0ecff,stroke:#2563eb,stroke-width:1.5px,color:#1e293b',
+    '    classDef decision fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#1e293b',
+    '    classDef output fill:#d1fae5,stroke:#16a34a,stroke-width:1.5px,color:#1e293b',
+    '    classDef routeE fill:#fecaca,stroke:#dc2626,stroke-width:1.5px,color:#1e293b',
+    '    classDef terminal fill:#1e293b,stroke:#475569,stroke-width:2px,color:#fff',
+    '    classDef subexp fill:#ede9fe,stroke:#7c3aed,stroke-width:1px,color:#1e293b',
+    '',
+    '    START(["START"]):::terminal',
+    '    START --> A1',
+    '',
+    '    subgraph S1["STEP 1: DEFINE PURPOSE"]',
+    '        A1["1.1 Identify Principal"]:::process',
+    '        A2["1.2 Identify Beneficiaries"]:::process',
+    '        A3["1.3 Define Capital Objectives"]:::process',
+    '        A4["1.4 Determine Governance"]:::process',
+    '        A5["1.5 Portfolio Architecture"]:::process',
+    '        A6["1.6 Formalize Mandate"]:::process',
+    '        A1 --> A2 --> A3',
+    '        A1 --> A4',
+    '        A2 --> A4',
+    '        A3 --> A5',
+    '        A4 --> A5',
+    '        A5 --> A6',
+    '    end',
+    '',
+    '    A6 -->|"Mandate Statement"| DN2',
+    '    DN2{"DN 2.0: Classify<br/>Objective Type"}:::decision',
+    '    DN2 -->|"Routes A/B/C/D"| B1',
+    '    DN2 -->|"Route E: Strategic Hold"| BE2',
+    '',
+    '    subgraph S2["STEP 2: DEFINE RULES"]',
+    '        B1["2.1 Return Objective"]:::process',
+    '        B2["2.2 Risk Parameters"]:::process',
+    '        B3["2.3 Time Horizon"]:::process',
+    '        B4["2.4 Constraints"]:::process',
+    '        B5["2.5 Benchmark"]:::process',
+    '        B6["2.6 Formalize Policy"]:::process',
+    '        B1 --> B2 --> B3 --> B4 --> B5 --> B6',
+    '    end',
+    '',
+    '    subgraph S2E["STEP 2: ROUTE E"]',
+    '        BE2["2.2 Risk Parameters"]:::routeE',
+    '        BE3["2.3 Time Horizon"]:::routeE',
+    '        BE4["2.4 Constraints"]:::routeE',
+    '        BE2 --> BE3 --> BE4',
+    '    end',
+    '',
+    '    B6 -->|"Investment Policy"| C1',
+    '    BE4 -->|"IPF Reduced"| C1',
+    '',
+    '    subgraph S3["STEP 3: MAP OPPORTUNITY SET"]',
+    '        C1["3.1 Asset Classes"]:::process',
+    '        C2["3.2 Instruments"]:::process',
+    '        C3["3.3 Markets"]:::process',
+    '        C4["3.4 Strategies"]:::process',
+    '        C5["3.5 Formalize Universe"]:::process',
+    '        C1 --> C2 --> C3 --> C4 --> C5',
+    '    end',
+    '',
+    '    C5 -->|"Eligible Universe"| RCHK',
+    '    RCHK{"Route E<br/>Active?"}:::decision',
+    '    RCHK -->|"No"| DN4',
+    '    RCHK -->|"Yes: Skip 4+5"| F1',
+    '',
+    '    DN4{"DN 4.0: Methodology<br/>per sleeve"}:::decision',
+    '    DN4 -->|"Route X/Y/Z"| D1',
+    '',
+    '    subgraph S4["STEP 4: METHODOLOGY"]',
+    '        D1["4.1 Allocation Framework"]:::process',
+    '        D2["4.2 Dynamic Adjustment"]:::process',
+    '        D3["4.3 Selection Criteria"]:::process',
+    '        D4["4.4 Formalize Model"]:::process',
+    '        D1 --> D2 --> D3 --> D4',
+    '    end',
+    '',
+    '    D3 -.->|"Route X Illiquid"| D31',
+    '    subgraph SUB43["4.3 SUB-EXPANSION"]',
+    '        D31["4.3.1 Origination"]:::subexp',
+    '        D32["4.3.2 Screening"]:::subexp',
+    '        D33["4.3.3 Prelim DD"]:::subexp',
+    '        D34["4.3.4 Detailed DD"]:::subexp',
+    '        D35["4.3.5 Valuation"]:::subexp',
+    '        D36["4.3.6 IC Approval"]:::subexp',
+    '        D37["4.3.7 Negotiation"]:::subexp',
+    '        D31 --> D32 --> D33 --> D34 --> D35 --> D36 --> D37',
+    '    end',
+    '',
+    '    D4 -->|"Allocation Model"| E1',
+    '',
+    '    subgraph S5["STEP 5: CONSTRUCT PORTFOLIO"]',
+    '        E1["5.1 Target Allocations"]:::process',
+    '        E2["5.2 Optimize"]:::process',
+    '        E3["5.3 Constraints"]:::process',
+    '        E4["5.4 Stress Test"]:::process',
+    '        E5["5.5 Finalize Target"]:::process',
+    '        E1 --> E2 --> E3 --> E4 --> E5',
+    '    end',
+    '',
+    '    E5 -->|"Target Portfolio"| F1',
+    '',
+    '    subgraph S6["STEP 6: EXECUTE"]',
+    '        F1["6.1 Execution Strategy"]:::process',
+    '        F2["6.2 Manage Execution"]:::process',
+    '        F3["6.3 Confirm"]:::process',
+    '        F4["6.4 Finalize Live"]:::process',
+    '        F1 --> F2 --> F3 --> F4',
+    '    end',
+    '',
+    '    F4 -->|"Live Portfolio"| G1',
+    '',
+    '    subgraph S7["STEP 7: MONITOR + ADAPT"]',
+    '        G1["7.1 Track Performance"]:::process',
+    '        G2["7.2 Attribution"]:::process',
+    '        G3["7.3 Reassess"]:::process',
+    '        G4["7.4 Adjustment Decision"]:::process',
+    '        G5["7.5 Report"]:::process',
+    '        G1 --> G2 --> G3 --> G4 --> G5',
+    '    end',
+    '',
+    '    G5 --> ENDSTATE(["END / NEXT CYCLE"]):::terminal',
+    '    G4 -.->|"Routine"| E1',
+    '    G4 -.->|"Significant"| DN4',
+    '    G4 -.->|"Fundamental"| A1'
+].join('\n');
+
+mmdSources[1] = [
+    'flowchart TD',
+    '    classDef process fill:#e0ecff,stroke:#2563eb,stroke-width:1.5px,color:#1e293b',
+    '    classDef output fill:#d1fae5,stroke:#16a34a,stroke-width:1.5px,color:#1e293b',
+    '    classDef note fill:#fefce8,stroke:#ca8a04,stroke-width:1px,color:#713f12',
+    '',
+    '    A1["1.1 Identify Principal<br/>Principal Profile"]:::process',
+    '    A2["1.2 Identify Beneficiaries<br/>with priority hierarchy"]:::process',
+    '    A3["1.3 Define Capital Objectives<br/>Objective Statement"]:::process',
+    '    A4["1.4 Determine Governance<br/>Governance Framework"]:::process',
+    '    A5["1.5 Portfolio Architecture<br/>Mandate Architecture"]:::process',
+    '    A6["1.6 Formalize Mandate<br/>Mandate Statement"]:::output',
+    '',
+    '    N1["Self-governed mandates include<br/>behavioral risk provisions"]:::note',
+    '    N2["Parallel objectives: separate sub-portfolios<br/>Compound objectives: single track,<br/>all filters on same pool"]:::note',
+    '',
+    '    A1 --> A2 --> A3',
+    '    A1 --> A4',
+    '    A2 --> A4',
+    '    A3 --> A5',
+    '    A4 --> A5',
+    '    A5 --> A6',
+    '    A4 -.- N1',
+    '    A5 -.- N2'
+].join('\n');
+
+mmdSources[2] = [
+    'flowchart TD',
+    '    classDef process fill:#e0ecff,stroke:#2563eb,stroke-width:1.5px,color:#1e293b',
+    '    classDef decision fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#1e293b',
+    '    classDef output fill:#d1fae5,stroke:#16a34a,stroke-width:1.5px,color:#1e293b',
+    '    classDef routeE fill:#fecaca,stroke:#dc2626,stroke-width:1.5px,color:#1e293b',
+    '',
+    '    IN[/"Mandate Statement"/]:::output',
+    '    IN --> DN2',
+    '    DN2{"DN 2.0: Classify<br/>Objective Framework"}:::decision',
+    '',
+    '    DN2 -->|"Route A"| RA["Return-Driven"]:::process',
+    '    DN2 -->|"Route B"| RB["Absolute Return"]:::process',
+    '    DN2 -->|"Route C"| RC["Liability-Driven"]:::process',
+    '    DN2 -->|"Route D"| RD["Hybrid / Multi-Obj"]:::process',
+    '    DN2 -->|"Route E"| RE["Non-Financial Hold"]:::routeE',
+    '',
+    '    RA --> B1',
+    '    RB --> B1',
+    '    RC --> B1',
+    '    RD -->|"Per sub-portfolio"| B1',
+    '',
+    '    B1["2.1 Return Objective"]:::process',
+    '    B2["2.2 Risk Parameters"]:::process',
+    '    B3["2.3 Time Horizon"]:::process',
+    '    B4["2.4 Constraints + Advantages"]:::process',
+    '    B5["2.5 Select Benchmark"]:::process',
+    '    B6["2.6 Formalize Policy"]:::output',
+    '',
+    '    B1 --> B2 --> B3 --> B4 --> B5 --> B6',
+    '',
+    '    RE -->|"Skip 2.1 + 2.5"| BE2["2.2 Risk - downside only"]:::routeE',
+    '    BE2 --> BE3["2.3 Horizon - indefinite"]:::routeE',
+    '    BE3 --> BE4["2.4 Constraints"]:::routeE',
+    '    BE4 --> B6R["IPF Reduced Scope"]:::output',
+    '',
+    '    B6 --> OUT[/"To Step 3"/]:::output',
+    '    B6R --> OUT'
+].join('\n');
+
+mmdSources[3] = [
+    'flowchart TD',
+    '    classDef process fill:#e0ecff,stroke:#2563eb,stroke-width:1.5px,color:#1e293b',
+    '    classDef output fill:#d1fae5,stroke:#16a34a,stroke-width:1.5px,color:#1e293b',
+    '    classDef note fill:#fefce8,stroke:#ca8a04,stroke-width:1px,color:#713f12',
+    '',
+    '    IN[/"Investment Policy Framework"/]:::output',
+    '    IN --> C1',
+    '    C1["3.1 Eligible Asset Classes"]:::process',
+    '    C2["3.2 Instruments, Vehicles, Deal Types"]:::process',
+    '    C3["3.3 Markets, Geographies, Sourcing"]:::process',
+    '    C4["3.4 Eligible Strategies"]:::process',
+    '    C5["3.5 Formalize Universe"]:::output',
+    '    C1 --> C2 --> C3 --> C4 --> C5',
+    '    C5 --> OUT[/"To Step 4 or Skip to 6"/]:::output',
+    '',
+    '    N1["Novel assets like DeFi may span<br/>multiple categories. Use primary<br/>function with cross-references."]:::note',
+    '    C4 -.- N1'
+].join('\n');
+
+mmdSources[4] = [
+    'flowchart TD',
+    '    classDef process fill:#e0ecff,stroke:#2563eb,stroke-width:1.5px,color:#1e293b',
+    '    classDef decision fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#1e293b',
+    '    classDef output fill:#d1fae5,stroke:#16a34a,stroke-width:1.5px,color:#1e293b',
+    '    classDef subexp fill:#ede9fe,stroke:#7c3aed,stroke-width:1.5px,color:#1e293b',
+    '    classDef note fill:#fefce8,stroke:#ca8a04,stroke-width:1px,color:#713f12',
+    '',
+    '    IN[/"Eligible Universe + IPF"/]:::output',
+    '    IN --> DN4',
+    '    DN4{"DN 4.0: Methodology<br/>Type per sleeve"}:::decision',
+    '',
+    '    DN4 -->|"Route X"| RX["Discretionary"]:::process',
+    '    DN4 -->|"Route Y"| RY["Systematic"]:::process',
+    '    DN4 -->|"Route Z"| RZ["Liability-Matching"]:::process',
+    '',
+    '    RX --> D1',
+    '    RY --> D1',
+    '    RZ --> D1',
+    '',
+    '    D1["4.1 Allocation Framework"]:::process',
+    '    D2["4.2 Dynamic Adjustment"]:::process',
+    '    D3["4.3 Selection Criteria"]:::process',
+    '    D4["4.4 Formalize Model"]:::output',
+    '    D1 --> D2 --> D3 --> D4',
+    '',
+    '    D3 -.->|"Route X Illiquid"| D31',
+    '    subgraph SUB["4.3 DEAL PROCESS"]',
+    '        D31["4.3.1 Origination"]:::subexp',
+    '        D32["4.3.2 Screening"]:::subexp',
+    '        D33["4.3.3 Preliminary DD"]:::subexp',
+    '        D34["4.3.4 Detailed DD"]:::subexp',
+    '        D35["4.3.5 Valuation"]:::subexp',
+    '        D36["4.3.6 IC Approval"]:::subexp',
+    '        D37["4.3.7 Negotiation"]:::subexp',
+    '        D31 --> D32 --> D33 --> D34 --> D35 --> D36 --> D37',
+    '    end',
+    '',
+    '    D4 --> OUT[/"To Step 5"/]:::output',
+    '    N1["Mixed-methodology funds: multiple<br/>sleeves with different routes"]:::note',
+    '    DN4 -.- N1'
+].join('\n');
+
+mmdSources[5] = [
+    'flowchart TD',
+    '    classDef process fill:#e0ecff,stroke:#2563eb,stroke-width:1.5px,color:#1e293b',
+    '    classDef output fill:#d1fae5,stroke:#16a34a,stroke-width:1.5px,color:#1e293b',
+    '    classDef mode fill:#fce7f3,stroke:#db2777,stroke-width:1px,color:#1e293b',
+    '    classDef note fill:#fefce8,stroke:#ca8a04,stroke-width:1px,color:#713f12',
+    '',
+    '    IN[/"Allocation Model"/]:::output',
+    '    M1["Single-Event: liquid"]:::mode',
+    '    M2["Iterative: illiquid/deal"]:::mode',
+    '    M3["Continuous: systematic"]:::mode',
+    '    IN --> M1 & M2 & M3',
+    '    M1 & M2 & M3 --> E1',
+    '',
+    '    E1["5.1 Target Allocations"]:::process',
+    '    E2["5.2 Optimize Risk/Return"]:::process',
+    '    E3["5.3 Constraints + Op Risk"]:::process',
+    '    E4["5.4 Stress Test"]:::process',
+    '    E5["5.5 Finalize Target"]:::output',
+    '    E1 --> E2 --> E3 --> E4 --> E5',
+    '    E5 --> OUT[/"To Step 6"/]:::output',
+    '',
+    '    N1["Transitional states: committed<br/>under construction, ramp-up,<br/>stabilized, exit"]:::note',
+    '    E5 -.- N1'
+].join('\n');
+
+mmdSources[6] = [
+    'flowchart TD',
+    '    classDef process fill:#e0ecff,stroke:#2563eb,stroke-width:1.5px,color:#1e293b',
+    '    classDef output fill:#d1fae5,stroke:#16a34a,stroke-width:1.5px,color:#1e293b',
+    '    classDef variant fill:#f0fdf4,stroke:#22c55e,stroke-width:1px,color:#1e293b',
+    '',
+    '    IN[/"Target Portfolio"/]:::output',
+    '    IN --> F1',
+    '    F1["6.1 Execution Strategy"]:::process',
+    '    F2["6.2 Manage Execution"]:::process',
+    '    F3["6.3 Confirm + Reconcile"]:::process',
+    '    F4["6.4 Finalize Live Portfolio"]:::output',
+    '    F1 --> F2 --> F3 --> F4',
+    '',
+    '    V1["Liquid: orders, algos,<br/>dark pool routing"]:::variant',
+    '    V2["Illiquid: signing, funding,<br/>capital calls"]:::variant',
+    '    V3["Novel: on-chain tx,<br/>gas, MEV, protocol"]:::variant',
+    '    V4["Route E: Hold.<br/>No action unless triggered"]:::variant',
+    '',
+    '    F1 -.- V1',
+    '    F2 -.- V2',
+    '    F2 -.- V3',
+    '    F1 -.- V4',
+    '    F4 --> OUT[/"To Step 7"/]:::output'
+].join('\n');
+
+mmdSources[7] = [
+    'flowchart TD',
+    '    classDef process fill:#e0ecff,stroke:#2563eb,stroke-width:1.5px,color:#1e293b',
+    '    classDef output fill:#d1fae5,stroke:#16a34a,stroke-width:1.5px,color:#1e293b',
+    '    classDef feedback fill:#fef2f2,stroke:#dc2626,stroke-width:1.5px,color:#991b1b',
+    '    classDef decision fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#1e293b',
+    '',
+    '    IN[/"Live Portfolio"/]:::output',
+    '    IN --> G1',
+    '    G1["7.1 Track Performance"]:::process',
+    '    G2["7.2 Attribution Analysis"]:::process',
+    '    G3["7.3 Reassess Conditions"]:::process',
+    '    G4{"7.4 Adjustment<br/>Decision"}:::decision',
+    '    G5["7.5 Report to Stakeholders"]:::output',
+    '',
+    '    G1 --> G2 --> G3 --> G4',
+    '    G4 -->|"No change"| G5',
+    '    G4 -->|"Routine"| FB1["Back to Step 5"]:::feedback',
+    '    G4 -->|"Significant"| FB2["Back to Step 4"]:::feedback',
+    '    G4 -->|"Fundamental"| FB3["Back to Step 1"]:::feedback',
+    '    G5 --> ENDSTATE(["END / NEXT CYCLE"]):::output'
+].join('\n');
+
+/* ============================================
+   BLOCK 4: COPY SOURCE (uses mmdSources only)
+   ============================================ */
+function copySource(idx) {
+    try {
+        if (!mmdSources[idx]) return;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(mmdSources[idx]);
+        }
+    } catch(e) { console.error('Copy error:', e); }
+}
+
+/* ============================================
+   BLOCK 5: MERMAID LOADING (fully isolated)
+   Fallback: shows source code if CDN blocked
+   ============================================ */
+(function() {
+    var targets = [
+        'dw-overview', 'dw-s1', 'dw-s2', 'dw-s3',
+        'dw-s4', 'dw-s5', 'dw-s6', 'dw-s7'
+    ];
+
+    targets.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.innerHTML = '<div class="diagram-loading">Loading diagram...</div>';
+    });
+
+    function showFallback(msg) {
+        targets.forEach(function(id, idx) {
+            var el = document.getElementById(id);
+            if (!el || !mmdSources[idx]) return;
+            var escaped = mmdSources[idx].replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+            el.innerHTML = '<div class="mermaid-source-label">' + msg + '</div><pre class="mermaid-source">' + escaped + '</pre>';
+        });
+    }
+
+    try {
+        var script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js';
+        script.onload = function() {
+            try {
+                mermaid.initialize({
+                    startOnLoad: false,
+                    theme: 'base',
+                    themeVariables: {
+                        primaryColor: '#e0ecff',
+                        primaryBorderColor: '#2563eb',
+                        primaryTextColor: '#1e293b',
+                        lineColor: '#475569',
+                        secondaryColor: '#f8fafc',
+                        tertiaryColor: '#fef3c7',
+                        fontSize: '13px',
+                        fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif'
+                    },
+                    flowchart: { curve: 'basis', padding: 16, htmlLabels: true }
+                });
+                targets.forEach(function(id, idx) {
+                    try {
+                        var el = document.getElementById(id);
+                        if (!el || !mmdSources[idx]) return;
+                        mermaid.render('mmd-' + idx, mmdSources[idx]).then(function(result) {
+                            el.innerHTML = result.svg;
+                        }).catch(function(err) {
+                            var escaped = mmdSources[idx].replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+                            el.innerHTML = '<div class="mermaid-source-label">Render error. Source (paste into mermaid.live):</div><pre class="mermaid-source">' + escaped + '</pre>';
+                        });
+                    } catch(e) { console.error('Render error ' + idx, e); }
+                });
+            } catch(initErr) {
+                console.error('Mermaid init error:', initErr);
+                showFallback('Mermaid init failed. Source (paste into mermaid.live):');
+            }
+        };
+        script.onerror = function() {
+            showFallback('Mermaid CDN unavailable in this environment. Source (paste into mermaid.live):');
+        };
+        document.body.appendChild(script);
+    } catch(e) {
+        console.error('Script load error:', e);
+        showFallback('Script load error. Source:');
+    }
+})();
+</script>
+</body>
+</html>

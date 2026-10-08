@@ -1,884 +1,435 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio Construction Framework v3</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-    <style>
-    :root { --bg:#F7F5F0; --paper:#FFFFFF; --ink:#13202F; --muted:#5D6B7A; --faint:#8A95A3; --rule:#E6E1D8; --accent:#1F3A5F; --gold:#A8874F;
-      --serif:"Fraunces", Georgia, serif; --sans:"Inter", system-ui, -apple-system, "Segoe UI", sans-serif; --mono:"JetBrains Mono", ui-monospace, monospace;
-      --s1:#DCE5EF; --s2:#DDE8DF; --s3:#EFE6CF; --s4:#EFDCD8; --s5:#E4DFEE; --s6:#F0E2D2; --s7:#E6E3DD; --seg-ink:#13202F; }
-    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#0F151C; --paper:#151D26; --ink:#E8E4DC; --muted:#A3ADB8; --faint:#7D8894; --rule:#26313C; --accent:#9DB8DA; --gold:#C9A86E;
-      --s1:#24364A; --s2:#253A30; --s3:#3E3523; --s4:#432C2A; --s5:#33304A; --s6:#42321F; --s7:#2E3238; --seg-ink:#E8E4DC; } }
-    :root[data-theme="dark"] { --bg:#0F151C; --paper:#151D26; --ink:#E8E4DC; --muted:#A3ADB8; --faint:#7D8894; --rule:#26313C; --accent:#9DB8DA; --gold:#C9A86E;
-      --s1:#24364A; --s2:#253A30; --s3:#3E3523; --s4:#432C2A; --s5:#33304A; --s6:#42321F; --s7:#2E3238; --seg-ink:#E8E4DC; }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body { font-family: var(--sans); font-size: 15px; background: var(--bg); color: var(--ink); line-height: 1.6; -webkit-font-smoothing: antialiased; }
-    a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portfolio Construction Framework</title>
+<meta name="description" content="A general portfolio construction process mapped against the CFA Institute portfolio management process and IPS elements.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<style>
+:root { --bg:#F7F5F0; --paper:#FFFFFF; --ink:#13202F; --muted:#5D6B7A; --faint:#8A95A3; --rule:#E6E1D8; --accent:#1F3A5F; --gold:#A8874F;
+  --serif:"Fraunces", Georgia, serif; --sans:"Inter", system-ui, -apple-system, "Segoe UI", sans-serif; --mono:"JetBrains Mono", ui-monospace, monospace; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#0F151C; --paper:#151D26; --ink:#E8E4DC; --muted:#A3ADB8; --faint:#7D8894; --rule:#26313C; --accent:#9DB8DA; --gold:#C9A86E; } }
+:root[data-theme="dark"] { --bg:#0F151C; --paper:#151D26; --ink:#E8E4DC; --muted:#A3ADB8; --faint:#7D8894; --rule:#26313C; --accent:#9DB8DA; --gold:#C9A86E; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; scroll-padding-top:24px; }
+body { margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+.top { border-bottom:1px solid var(--rule); background:var(--paper); }
+.top .in { max-width:1320px; margin:0 auto; padding:12px 16px; display:flex; flex-wrap:wrap; gap:6px 18px; justify-content:space-between; font-size:13px; color:var(--muted); }
+.top b { color:var(--ink); font-weight:600; letter-spacing:.2px; }
+.shell { max-width:1320px; margin:0 auto; padding:0 16px; display:grid; grid-template-columns:220px minmax(0,1fr); gap:48px; }
+aside.toc { position:sticky; top:0; align-self:start; max-height:100vh; overflow:auto; padding:40px 0 24px; font-size:13px; }
+aside.toc .lbl { font-size:11px; letter-spacing:1.4px; text-transform:uppercase; color:var(--faint); margin:16px 0 6px; }
+aside.toc a { display:flex; gap:10px; padding:4px 10px; margin-left:-10px; border-left:2px solid transparent; color:var(--muted); line-height:1.35; }
+aside.toc a span.n { font-family:var(--mono); font-size:11px; color:var(--faint); min-width:18px; padding-top:1px; }
+aside.toc a.on { color:var(--ink); border-left-color:var(--gold); background:color-mix(in srgb, var(--gold) 8%, transparent); }
+aside.toc a:hover { text-decoration:none; color:var(--ink); }
+main { padding:48px 0 80px; min-width:0; }
+.eyebrow { font-size:12px; letter-spacing:1.6px; text-transform:uppercase; color:var(--gold); font-weight:600; }
+h1 { font-family:var(--serif); font-weight:500; font-size:clamp(34px,5vw,54px); line-height:1.05; letter-spacing:-.6px; margin:12px 0 14px; }
+.subtitle { font-family:var(--serif); font-size:clamp(18px,2.2vw,22px); line-height:1.4; color:var(--muted); max-width:760px; margin:0 0 18px; font-weight:400; }
+.meta { font-size:13px; color:var(--faint); display:flex; flex-wrap:wrap; gap:4px 16px; margin-bottom:28px; }
+.lede { max-width:760px; font-size:16px; }
+.stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); margin:32px 0; }
+.stat { padding:18px 16px 16px 0; }
+.stat b { display:block; font-family:var(--serif); font-weight:500; font-size:40px; line-height:1; letter-spacing:-.5px; }
+.stat span { display:block; margin-top:8px; font-size:12.5px; color:var(--muted); }
+.panel { background:var(--paper); border:1px solid var(--rule); border-radius:14px; padding:24px; display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:28px; }
+.panel h3 { font-family:var(--serif); font-weight:500; font-size:22px; margin:0 0 8px; }
+.panel p { margin:0; color:var(--muted); }
+.legend { list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+.legend li { display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:center; font-size:13.5px; color:var(--muted); }
+.legend li b { font-family:var(--serif); font-size:20px; font-weight:500; color:var(--ink); }
+.chip { display:inline-flex; align-items:center; gap:6px; font-size:11.5px; font-weight:600; letter-spacing:.2px; padding:3px 9px; border-radius:999px; white-space:nowrap; border:1px solid transparent; }
+.chip i { width:7px; height:7px; border-radius:50%; display:inline-block; }
+section.block { margin-top:72px; }
+h2.sec { font-family:var(--serif); font-weight:500; font-size:30px; letter-spacing:-.3px; margin:6px 0 10px; line-height:1.15; }
+.secnote { color:var(--muted); max-width:760px; margin:0 0 22px; }
+.cycle { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:0; border-top:2px solid var(--rule); }
+.cycle .st { padding:16px 14px 6px 0; position:relative; }
+.cycle .st::before { content:""; position:absolute; top:-7px; left:0; width:12px; height:12px; border-radius:50%; background:var(--bg); border:2px solid var(--faint); }
+.cycle .st.here::before { background:var(--gold); border-color:var(--gold); }
+.cycle .st.here { }
+.cycle .k { font-family:var(--mono); font-size:11px; color:var(--faint); }
+.cycle .t { font-family:var(--serif); font-size:16.5px; line-height:1.25; margin:4px 0 6px; }
+.cycle .m { font-size:12.5px; color:var(--muted); }
+.cycle .st.here .t { color:var(--accent); }
+.cycle .tag { display:inline-block; font-size:10.5px; letter-spacing:1px; text-transform:uppercase; color:var(--gold); font-weight:600; margin-top:6px; }
+.rail { display:grid; gap:14px; }
+.grp { display:grid; grid-template-columns:180px minmax(0,1fr); gap:18px; align-items:start; padding:14px 0; border-top:1px solid var(--rule); }
+.grp .gh { font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:var(--faint); font-weight:600; padding-top:10px; }
+.cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:10px; }
+a.card { display:block; background:var(--paper); border:1px solid var(--rule); border-radius:12px; padding:12px 14px; color:var(--ink); transition:border-color .15s, transform .15s; }
+a.card:hover { border-color:var(--gold); text-decoration:none; transform:translateY(-1px); }
+a.card .k { font-family:var(--mono); font-size:11px; color:var(--gold); }
+a.card .t { font-family:var(--serif); font-size:16px; line-height:1.25; margin:3px 0 6px; }
+a.card .c { font-size:12px; color:var(--faint); }
+a.card.sub { background:transparent; border-style:dashed; }
+section.phase { margin-top:84px; }
+.ph-head { display:flex; gap:18px; align-items:flex-start; }
+.badge { flex:none; width:52px; height:52px; border-radius:50%; border:1px solid var(--gold); color:var(--gold); display:grid; place-items:center; font-family:var(--serif); font-size:22px; }
+.badge.sub { border-style:dashed; font-size:14px; font-family:var(--sans); font-weight:600; }
+.ph-head .kick { font-size:12px; letter-spacing:1.4px; text-transform:uppercase; color:var(--faint); font-weight:600; }
+.ph-head h2 { font-family:var(--serif); font-weight:500; font-size:clamp(24px,3vw,32px); line-height:1.12; letter-spacing:-.3px; margin:2px 0 0; }
+.authority { margin:20px 0 6px; padding:14px 18px; border-left:3px solid var(--gold); background:var(--paper); border-radius:0 10px 10px 0; font-size:14.5px; }
+.authority .l { font-size:11px; letter-spacing:1.3px; text-transform:uppercase; color:var(--gold); font-weight:600; display:block; margin-bottom:2px; }
+.anchors { font-size:12.5px; color:var(--faint); margin:8px 0 22px; }
+.anchors b { color:var(--muted); font-weight:600; }
+.ph-body { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:24px; align-items:start; }
+figure.diagram { margin:0; background:#FFFFFF; border:1px solid var(--rule); border-radius:14px; padding:18px 10px; position:sticky; top:16px; max-height:calc(100vh - 32px); overflow:auto; }
+figure.diagram .mermaid { display:flex; justify-content:center; }
+figure.diagram svg { max-width:100%; height:auto; }
+ol.tasks { list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+ol.tasks li { background:var(--paper); border:1px solid var(--rule); border-radius:12px; padding:14px 16px; }
+ol.tasks .row { display:flex; flex-wrap:wrap; align-items:center; gap:8px 10px; margin-bottom:6px; }
+ol.tasks .id { font-family:var(--mono); font-size:12px; color:var(--muted); }
+ol.tasks .own { font-size:12px; color:var(--muted); margin-left:auto; }
+ol.tasks .own::before { content:"Owner  "; color:var(--faint); }
+ol.tasks h4 { margin:0 0 4px; font-size:15px; font-weight:600; line-height:1.35; }
+ol.tasks p { margin:0; font-size:14px; color:var(--muted); }
+ol.tasks .ref { margin-top:8px; font-size:12px; color:var(--faint); }
+ol.tasks .ref.bp { color:var(--gold); }
+ol.qs { counter-reset:q; } ol.qs li { counter-increment:q; } ol.qs h4::before { content:counter(q) ". "; color:var(--gold); font-family:var(--serif); }
+footer { margin-top:96px; padding-top:20px; border-top:1px solid var(--rule); color:var(--faint); font-size:13px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:10px; }
+@media (max-width:1100px) { .ph-body { grid-template-columns:1fr; } figure.diagram { position:static; max-height:none; } }
+@media (max-width:900px) { .shell { grid-template-columns:1fr; gap:0; } aside.toc { display:none; } .panel { grid-template-columns:1fr; } .cycle { grid-template-columns:repeat(2,minmax(0,1fr)); row-gap:18px; } .grp { grid-template-columns:1fr; gap:8px; } }
+@media print { aside.toc, .top { display:none; } .shell { display:block; } figure.diagram { position:static; max-height:none; } section.phase { break-before:page; } }
 
-    .mt-top { border-bottom: 1px solid var(--rule); background: var(--paper); }
-    .mt-top .in { max-width: 1320px; margin: 0 auto; padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 6px 18px; justify-content: space-between; font: 13px/1.5 var(--sans); color: var(--muted); }
-    .mt-top b { color: var(--ink); font-weight: 600; } .mt-top a { color: var(--accent); text-decoration: none; }
-
-    .wrap { max-width: 1320px; margin: 0 auto; padding: 0 16px; }
-    .hero { background: var(--bg); padding: 48px 0 8px; }
-    .eyebrow { font-size: 12px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--gold); font-weight: 600; }
-    .hero h1 { font-family: var(--serif); font-weight: 500; font-size: clamp(34px,5vw,54px); line-height: 1.05; letter-spacing: -.6px; color: var(--ink); margin: 12px 0 14px; }
-    .hero .subtitle { font-family: var(--serif); font-weight: 400; font-size: clamp(18px,2.2vw,22px); line-height: 1.4; color: var(--muted); max-width: 760px; margin: 0 0 12px; }
-    .hero .meta { font-size: 13px; color: var(--faint); }
-    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); margin: 32px 0; }
-    .stat { padding: 18px 16px 16px 0; }
-    .stat .num { display: block; font-family: var(--serif); font-weight: 500; font-size: 40px; line-height: 1; letter-spacing: -.5px; color: var(--ink); }
-    .stat .label { display: block; margin-top: 8px; font-size: 12.5px; color: var(--muted); }
-
-    .stacked-bar-container { background: var(--paper); border: 1px solid var(--rule); border-radius: 14px; padding: 20px 24px; margin-bottom: 40px; }
-    .stacked-bar-container h3 { font-family: var(--serif); font-weight: 500; font-size: 20px; color: var(--ink); margin-bottom: 12px; }
-    .stacked-bar { display: flex; border-radius: 8px; overflow: hidden; height: 32px; border: 1px solid var(--rule); }
-    .stacked-bar .seg { display: flex; align-items: center; justify-content: center; font: 500 11.5px var(--mono); color: var(--seg-ink); white-space: nowrap; overflow: hidden; }
-    .stacked-bar .seg + .seg { border-left: 1px solid var(--paper); }
-    .bar-legend { display: flex; gap: 8px 18px; margin-top: 14px; font-size: 13px; color: var(--muted); flex-wrap: wrap; }
-    .bar-legend span { display: flex; align-items: center; gap: 6px; }
-    .bar-legend .dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
-    .c1 { background: var(--s1) !important; } .c2 { background: var(--s2) !important; } .c3 { background: var(--s3) !important; } .c4 { background: var(--s4) !important; }
-    .c5 { background: var(--s5) !important; } .c6 { background: var(--s6) !important; } .c7 { background: var(--s7) !important; }
-
-    .tab-bar {
-        position: sticky; top: 0; z-index: 100; background: var(--paper);
-        border-bottom: 1px solid var(--rule); border-top: 1px solid var(--rule);
-    }
-    .tab-bar .in { max-width: 1320px; margin: 0 auto; padding: 0 16px; display: flex; overflow-x: auto; scrollbar-width: thin; }
-    .tab-bar .in::-webkit-scrollbar { height: 3px; }
-    .tab-bar .in::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 2px; }
-    .tab-btn {
-        background: none; border: none; padding: 14px 16px; font-size: 14px; font-family: var(--sans);
-        font-weight: 500; color: var(--muted); cursor: pointer; white-space: nowrap;
-        border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color .15s, border-color .15s;
-    }
-    .tab-btn:first-child { padding-left: 0; }
-    .tab-btn:hover { color: var(--ink); }
-    .tab-btn.active { color: var(--ink); border-bottom-color: var(--gold); }
-
-    .tab-content { display: none; padding: 32px 16px 24px; max-width: 1320px; margin: 0 auto; }
-    .tab-content.active { display: block; }
-
-    .card {
-        background: var(--paper); border: 1px solid var(--rule); border-radius: 14px; padding: 24px; margin-bottom: 20px;
-    }
-    .card-header { display: flex; align-items: center; gap: 10px 12px; margin-bottom: 18px; flex-wrap: wrap; }
-    .card-header h2 { font-family: var(--serif); font-size: 29px; line-height: 1.15; letter-spacing: -.3px; color: var(--ink); font-weight: 500; margin-right: 6px; }
-    .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 600; letter-spacing: .2px; border: 1px solid transparent; white-space: nowrap; }
-    .badge-blue { background: #E6EDF6; color: #1F3A5F; border-color: #CFDBEA; }
-    .badge-amber { background: #F6EEDC; color: #7A5A1E; border-color: #EADBB8; }
-    .badge-green { background: #E5F0E8; color: #2E5A3C; border-color: #CCE0D2; }
-    .badge-purple { background: #ECE8F4; color: #4B3C72; border-color: #DAD3EA; }
-    .badge-red { background: #F6E5E3; color: #8A3329; border-color: #EBCDC9; }
-
-    .diagram-wrapper {
-        border: 1px solid var(--rule); border-radius: 12px; padding: 20px;
-        overflow-x: auto; background: #FFFFFF; min-height: 120px;
-    }
-    .diagram-wrapper svg { max-width: none !important; }
-    .diagram-actions { display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end; flex-wrap: wrap; }
-    .btn {
-        padding: 7px 14px; border-radius: 8px; border: 1px solid var(--rule);
-        background: var(--paper); color: var(--muted); cursor: pointer; font-size: 13px;
-        font-family: var(--sans); transition: border-color .15s, color .15s; display: inline-flex; align-items: center; gap: 5px;
-    }
-    .btn:hover { border-color: var(--gold); color: var(--ink); }
-
-    .note-box {
-        background: var(--paper); border-left: 3px solid var(--gold); border-radius: 0 10px 10px 0;
-        padding: 14px 18px; margin-top: 16px; font-size: 14px; color: var(--muted);
-    }
-    .note-box strong { color: var(--ink); }
-
-    .legend-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
-    .legend-card { padding: 18px; margin-bottom: 0; border-radius: 12px; }
-    .legend-card h4 { font-family: var(--serif); font-size: 18px; color: var(--ink); margin-bottom: 10px; font-weight: 500; }
-    .legend-item { display: flex; align-items: center; gap: 10px; padding: 5px 0; font-size: 14px; color: var(--muted); }
-    .legend-item strong { color: var(--ink); font-weight: 600; }
-    .legend-item:not(:has(.legend-swatch)) { display: block; }
-    .legend-swatch { width: 28px; height: 18px; border-radius: 4px; border: 1px solid #ccc; flex-shrink: 0; }
-
-    .lightbox {
-        display: none; position: fixed; inset: 0; z-index: 1000;
-        background: rgba(15,21,28,0.9); justify-content: center; align-items: center; flex-direction: column;
-    }
-    .lightbox.open { display: flex; }
-    .lightbox-controls { position: absolute; top: 16px; right: 16px; display: flex; gap: 8px; z-index: 1001; }
-    .lightbox-controls button {
-        width: 38px; height: 38px; border-radius: 50%; border: none;
-        background: rgba(255,255,255,0.15); color: #fff; font-size: 1.1rem;
-        cursor: pointer; transition: background 0.2s;
-    }
-    .lightbox-controls button:hover { background: rgba(255,255,255,0.3); }
-    .lightbox-canvas { overflow: auto; max-width: 95vw; max-height: 90vh; cursor: grab; border-radius: 8px; }
-    .lightbox-canvas:active { cursor: grabbing; }
-    .lightbox-canvas svg { background: #fff; border-radius: 8px; display: block; }
-    .lightbox-zoom-info {
-        position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
-        background: rgba(0,0,0,0.5); color: #fff; padding: 5px 12px; border-radius: 16px; font-size: 12.5px;
-    }
-
-    .footer { max-width: 1320px; margin: 64px auto 0; padding: 20px 16px 40px; color: var(--faint); font-size: 13px; }
-    .footer .in { border-top: 1px solid var(--rule); padding-top: 20px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; }
-
-    .mermaid-error { padding: 16px; color: #8A3329; font-size: 13px; font-family: var(--mono); }
-    .mermaid-source { padding: 16px; background: #F7F5F0; border: 1px solid #E6E1D8; border-radius: 8px; font-family: var(--mono); font-size: 12px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; color: #5D6B7A; max-height: 400px; overflow-y: auto; }
-    .mermaid-source-label { font-size: 11px; color: #8A95A3; margin-bottom: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px; }
-    .diagram-loading { padding: 40px; text-align: center; color: #8A95A3; font-size: 13px; }
-
-    @media (max-width: 768px) {
-        .hero { padding-top: 32px; }
-        .stat .num { font-size: 32px; }
-        .stats { grid-template-columns: repeat(2, minmax(0,1fr)); }
-        .stacked-bar-container { padding: 16px; }
-        .stacked-bar .seg { font-size: 10px; }
-        .tab-btn { padding: 12px 12px; font-size: 13.5px; }
-        .tab-content { padding: 20px 16px; }
-        .card { padding: 16px; }
-        .card-header h2 { font-size: 24px; }
-        .diagram-wrapper { padding: 12px; }
-        .legend-grid { grid-template-columns: 1fr; }
-    }
-    </style>
-</head>
-<body>
-<div class="mt-top"><div class="in"><span><b>mindtensorML</b> · Process maps for AI in investment work</span><span>By Caesar Rana, CFA, APMG CP3P · <a href="https://mindtensorml.github.io/">All maps</a></span></div></div>
-
-<section class="hero">
-  <div class="wrap">
-    <div class="eyebrow">Portfolio construction · Framework v3</div>
-    <h1>Portfolio Construction Framework v3</h1>
-    <p class="subtitle">A general portfolio construction process that routes by objective and method, written to be followed step by step.</p>
-    <div class="stats">
-        <div class="stat"><span class="num">7</span><span class="label">Steps</span></div>
-        <div class="stat"><span class="num">5</span><span class="label">Obj. Routes</span></div>
-        <div class="stat"><span class="num">3</span><span class="label">Method Routes</span></div>
-        <div class="stat"><span class="num">3</span><span class="label">Feedback Tiers</span></div>
-    </div>
-    <div class="stacked-bar-container">
-        <h3>Sub-Steps by Step</h3>
-        <div class="stacked-bar">
-            <div class="seg c1" style="width:18%;background:#bfdbfe">S1: 6</div>
-            <div class="seg c2" style="width:18%;background:#bbf7d0">S2: 6</div>
-            <div class="seg c3" style="width:15%;background:#fef08a">S3: 5</div>
-            <div class="seg c4" style="width:12%;background:#fecaca">S4: 4</div>
-            <div class="seg c5" style="width:15%;background:#e9d5ff">S5: 5</div>
-            <div class="seg c6" style="width:12%;background:#fed7aa">S6: 4</div>
-            <div class="seg c7" style="width:15%;background:#e2e8f0">S7: 5</div>
-        </div>
-        <div class="bar-legend">
-            <span><span class="dot c1" style="background:#bfdbfe"></span>Define Purpose</span>
-            <span><span class="dot c2" style="background:#bbf7d0"></span>Define Rules</span>
-            <span><span class="dot c3" style="background:#fef08a"></span>Map Universe</span>
-            <span><span class="dot c4" style="background:#fecaca"></span>Methodology</span>
-            <span><span class="dot c5" style="background:#e9d5ff"></span>Construct</span>
-            <span><span class="dot c6" style="background:#fed7aa"></span>Execute</span>
-            <span><span class="dot c7" style="background:#e2e8f0"></span>Monitor</span>
-        </div>
-    </div>
-  </div>
-</section>
-
-<nav class="tab-bar"><div class="in">
-    <button class="tab-btn active" data-tab="tab-overview">Overview</button>
-    <button class="tab-btn" data-tab="tab-s1">1. Purpose</button>
-    <button class="tab-btn" data-tab="tab-s2">2. Rules</button>
-    <button class="tab-btn" data-tab="tab-s3">3. Universe</button>
-    <button class="tab-btn" data-tab="tab-s4">4. Methodology</button>
-    <button class="tab-btn" data-tab="tab-s5">5. Construct</button>
-    <button class="tab-btn" data-tab="tab-s6">6. Execute</button>
-    <button class="tab-btn" data-tab="tab-s7">7. Monitor</button>
-    <button class="tab-btn" data-tab="tab-legend">Legend</button>
-</div></nav>
-
-<!-- OVERVIEW -->
-<div class="tab-content active" id="tab-overview">
-    <div class="card">
-        <div class="card-header">
-            <h2>Full structural logic</h2>
-            <span class="badge badge-blue">7 Steps</span>
-            <span class="badge badge-amber">2 Decision Nodes</span>
-            <span class="badge badge-red">3 Feedback Loops</span>
-        </div>
-        <div class="diagram-wrapper" id="dw-overview"></div>
-        <div class="diagram-actions">
-            <button class="btn" onclick="openLightbox('dw-overview')">&#x26F6; Fullscreen</button>
-            <button class="btn" onclick="copySource(0)">&#x2398; Copy Mermaid</button>
-        </div>
-    </div>
+.cycle.c3 { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.srcs { list-style:none; margin:0; padding:0; display:grid; gap:6px; font-size:13.5px; color:var(--muted); }
+.srcs b { font-family:var(--mono); font-size:12px; color:var(--gold); font-weight:500; display:inline-block; min-width:118px; }
+@media (max-width:900px) { .cycle.c3 { grid-template-columns:1fr; } .srcs b { display:block; } }
+</style></head><body>
+<div class="top"><div class="in"><span><b>mindtensorML</b> · Process maps for AI in investment work</span><span>By Caesar Rana, CFA, APMG CP3P · <a href="https://mindtensorml.github.io/">All maps</a></span></div></div>
+<div class="shell">
+<aside class="toc" aria-label="Contents"><div class="lbl">Overview</div><a href="#top"><span class="n">·</span>Introduction</a><a href="#cycle"><span class="n">·</span>The process cycle</a><a href="#map"><span class="n">·</span>The map at a glance</a><div class="lbl">Steps</div><a href="#PU"><span class="n">01</span>Define Purpose</a><a href="#RU"><span class="n">02</span>Define Rules in the Investment Policy Statement</a><a href="#OP"><span class="n">03</span>Map the Opportunity Set</a><a href="#ME"><span class="n">04</span>Choose the Selection or Allocation Methodology</a><a href="#CO"><span class="n">05</span>Construct the Portfolio</a><a href="#EX"><span class="n">06</span>Execute</a><a href="#MO"><span class="n">07</span>Monitor and Adapt</a><div class="lbl">Subprocess</div><a href="#DP"><span class="n">·</span>Illiquid Deal Process</a><div class="lbl">Review</div><a href="#sources"><span class="n">·</span>Sources</a><a href="#questions"><span class="n">·</span>Open questions</a></aside>
+<main>
+<div id="top" class="eyebrow">Portfolio management · Institutional and multi-asset · v2, October 2026</div>
+<h1>Portfolio Construction Framework</h1>
+<p class="subtitle">From purpose and policy to construction, execution and feedback, routed by objective type and by method for each sleeve.</p>
+<div class="meta"><span>v2, October 2026</span><span>Mapped against the CFA Institute portfolio management process and IPS elements</span><span>A general method with no client data</span></div>
+<p class="lede">The map follows CFA Institute's planning, execution and feedback process in seven steps. A gate in Step 2 routes each portfolio by objective type. A gate in Step 4 routes each sleeve by method, and illiquid deals run through their own subprocess. Feedback in Step 7 sends work back to execution, to the method or to the mandate. Each task cites a public standard where one speaks to it. Where none does, the task is marked as practitioner practice.</p>
+<div class="stats">
+ <div class="stat"><b>7</b><span>Steps</span></div>
+ <div class="stat"><b>55</b><span>Tasks</span></div>
+ <div class="stat"><b>8</b><span>Decision gates</span></div>
+ <div class="stat"><b>5</b><span>Objective routes</span></div>
+ <div class="stat"><b>3</b><span>Method routes</span></div>
+ <div class="stat"><b>3</b><span>Feedback tiers</span></div>
 </div>
+<div class="panel"><div><h3>Who signs</h3><p>Every task and gate has a named owner role. The investment committee or the client approves the IPS and the target portfolio, and the board approves the mandate. Commitments to counterparties, judgments on managers and brokers, and every sign-off stay with people. Where a model drafts, the owner reviews and signs. The tags are design estimates of what a frontier model could do with the owner accountable. They are not measured results.</p></div>
+<ul class="legend"><li><span class="chip" style="background:#F6E3DF;color:#8A2F22"><i style="background:#8A2F22"></i>Human-only</span><span>Commitments, counterparty and people judgments, and sign-offs</span><b>4</b></li><li><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span>A model drafts, the owner reviews and signs</span><b>40</b></li><li><span class="chip" style="background:#E2EFE6;color:#2D5F3D"><i style="background:#2D5F3D"></i>Model-run</span><span>A model executes, the owner is accountable and samples the output</span><b>11</b></li><li><span class="chip" style="background:#EBE5F3;color:#4B3576"><i style="background:#4B3576"></i>Decision gate</span><span>A decision with a named owner</span><b>8</b></li><li><span class="chip" style="background:#E3EBF4;color:#1F3A5F"><i style="background:#1F3A5F"></i>External parameter</span><span>Read from law, governing documents or the actuary, never chosen by the portfolio team</span><b>2</b></li></ul></div>
 
-<!-- STEP 1 -->
-<div class="tab-content" id="tab-s1">
-    <div class="card">
-        <div class="card-header">
-            <h2>Step 1: Define Purpose</h2>
-            <span class="badge badge-blue">Universal</span>
-            <span class="badge badge-green">6 Sub-Steps</span>
-        </div>
-        <div class="diagram-wrapper" id="dw-s1"></div>
-        <div class="diagram-actions">
-            <button class="btn" onclick="openLightbox('dw-s1')">&#x26F6; Fullscreen</button>
-            <button class="btn" onclick="copySource(1)">&#x2398; Copy Mermaid</button>
-        </div>
-    </div>
-</div>
+<section class="block" id="cycle"><div class="eyebrow">Context</div><h2 class="sec">Where the steps sit in the portfolio management process</h2>
+<p class="secnote">CFA Institute describes portfolio management as planning, then execution, then feedback that loops back to both. The seven steps below sit inside those three stages. References use short names, listed in full under Sources. 5 nodes rest on practitioner practice alone, and 13 more draw on it in part.</p>
+<div class="cycle c3"><div class="st here"><div class="k">PMP S5.1</div><div class="t">Planning</div><div class="m">Objectives and constraints, the IPS, capital market expectations and the allocation method. CFA Institute puts the strategic allocation here. This map sets and approves it in Step 5, next to construction.</div><span class="tag">Steps 1 to 4</span></div><div class="st here"><div class="k">PMP S5.2</div><div class="t">Execution</div><div class="m">The strategic allocation and target portfolio, then implementation and trading, with costs counted.</div><span class="tag">Steps 5 and 6</span></div><div class="st here"><div class="k">PMP S5.3</div><div class="t">Feedback</div><div class="m">Monitoring and rebalancing, then performance evaluation, which sends work back to the right step.</div><span class="tag">Step 7</span></div></div></section>
 
-<!-- STEP 2 -->
-<div class="tab-content" id="tab-s2">
-    <div class="card">
-        <div class="card-header">
-            <h2>Step 2: Define Rules</h2>
-            <span class="badge badge-amber">Decision Node 2.0</span>
-            <span class="badge badge-green">5 Routes</span>
-        </div>
-        <div class="diagram-wrapper" id="dw-s2"></div>
-        <div class="diagram-actions">
-            <button class="btn" onclick="openLightbox('dw-s2')">&#x26F6; Fullscreen</button>
-            <button class="btn" onclick="copySource(2)">&#x2398; Copy Mermaid</button>
-        </div>
-    </div>
-</div>
+<section class="block" id="map"><div class="eyebrow">Structure</div><h2 class="sec">The map at a glance</h2>
+<p class="secnote">The objective routes are A. Benchmark-relative, B. Absolute return, C. Liability-driven, D. Per sub-portfolio, E. Strategic holding. The method routes per sleeve are X. Discretionary, Y. Systematic, Z. Liability-matching. A strategic holding skips Steps 4 and 5 and goes straight to execution, where it usually holds.</p>
+<div class="rail"><div class="grp"><div class="gh">Planning</div><div class="cards"><a class="card" href="#PU"><div class="k">Step 01</div><div class="t">Define Purpose</div><div class="c">7 nodes</div></a><a class="card" href="#RU"><div class="k">Step 02</div><div class="t">Define Rules in the Investment Policy Statement</div><div class="c">13 nodes</div></a><a class="card" href="#OP"><div class="k">Step 03</div><div class="t">Map the Opportunity Set</div><div class="c">6 nodes</div></a><a class="card" href="#ME"><div class="k">Step 04</div><div class="t">Choose the Selection or Allocation Methodology</div><div class="c">8 nodes</div></a></div></div><div class="grp"><div class="gh">Execution</div><div class="cards"><a class="card" href="#CO"><div class="k">Step 05</div><div class="t">Construct the Portfolio</div><div class="c">7 nodes</div></a><a class="card" href="#EX"><div class="k">Step 06</div><div class="t">Execute</div><div class="c">8 nodes</div></a></div></div><div class="grp"><div class="gh">Feedback</div><div class="cards"><a class="card" href="#MO"><div class="k">Step 07</div><div class="t">Monitor and Adapt</div><div class="c">8 nodes</div></a></div></div><div class="grp"><div class="gh">Called from Step 4</div><div class="cards"><a class="card sub" href="#DP"><div class="k">Subprocess</div><div class="t">Illiquid Deal Process</div><div class="c">8 nodes</div></a></div></div></div></section>
 
-<!-- STEP 3 -->
-<div class="tab-content" id="tab-s3">
-    <div class="card">
-        <div class="card-header">
-            <h2>Step 3: Map Opportunity Set</h2>
-            <span class="badge badge-blue">Universal</span>
-            <span class="badge badge-green">5 Sub-Steps</span>
-        </div>
-        <div class="diagram-wrapper" id="dw-s3"></div>
-        <div class="diagram-actions">
-            <button class="btn" onclick="openLightbox('dw-s3')">&#x26F6; Fullscreen</button>
-            <button class="btn" onclick="copySource(3)">&#x2398; Copy Mermaid</button>
-        </div>
-    </div>
-</div>
+<section class="phase" id="PU"><div class="ph-head"><div class="badge">1</div><div><div class="kick">Step 01</div><h2>Define Purpose</h2></div></div>
+<div class="authority"><span class="l">What good looks like</span>The investor, the assets in scope and the governing body are named first. The IPS later records who sets policy, who carries it out and who monitors it. The governing board approves the mandate before any rules are written.</div>
+<div class="anchors"><b>Standard anchors</b> · IPS s1a, s1b, s2a to s2d, s3a; PMP s5.1.2; PAA goals-based sub-portfolios</div>
+<div class="ph-body"><figure class="diagram"><pre class="mermaid">flowchart TD
+  classDef llm fill:#E2EFE6,stroke:#9CC3A8,color:#1E3A28,stroke-width:1px
+  classDef hyb fill:#F6EDD6,stroke:#D9C38A,color:#4A3609,stroke-width:1px
+  classDef hum fill:#F6E3DF,stroke:#DDAFA5,color:#5C1F16,stroke-width:1px
+  classDef gate fill:#EBE5F3,stroke:#B7A6D6,color:#33244F,stroke-width:1px
+  classDef par fill:#E3EBF4,stroke:#9FB6D3,color:#1F3A5F,stroke-width:1px
+  classDef ext fill:#FAF8F4,stroke:#BDB6A8,color:#5D6B7A,stroke-dasharray:4 3
+  classDef term fill:#13202F,stroke:#13202F,color:#F7F5F0
+  PU_01[&quot;PU-01: Identify the investor and the assets in scope&quot;]:::hyb
+  PU_02[&quot;PU-02: Identify beneficiaries and their order of priority&quot;]:::hyb
+  PU_03[&quot;PU-03: Define the capital objectives&quot;]:::hyb
+  PU_04[&quot;PU-04: Set governance and delegation&quot;]:::hyb
+  PU_05[&quot;PU-05: Choose the portfolio architecture&quot;]:::hyb
+  PU_06[&quot;PU-06: Draft the mandate statement&quot;]:::hyb
+  PU_D1{&quot;PU-D1: Approve the mandate?&quot;}:::gate
+  START([&quot;Start&quot;]):::term
+  START --&gt; PU_01
+  PU_01 --&gt; PU_02
+  PU_02 --&gt; PU_03
+  PU_01 --&gt; PU_04
+  PU_02 --&gt; PU_04
+  PU_03 --&gt; PU_05
+  PU_04 --&gt; PU_05
+  PU_05 --&gt; PU_06
+  PU_06 --&gt; PU_D1
+  RU[[&quot;Step 2&lt;br/&gt;Define Rules in the&lt;br/&gt;Investment Policy&lt;br/&gt;Statement&quot;]]:::ext
+  PU_D1 --&gt;|Approved| RU
+  PU_D1 --&gt;|Revise| PU_03</pre></figure><ol class="tasks"><li id="PU-01"><div class="row"><span class="id">PU-01</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Chief investment officer</span></div><h4>Identify the investor and the assets in scope</h4><p>Name the legal entity and the pools of assets this mandate governs. A model drafts the profile from the governing documents.</p><div class="ref">IPS s1a</div></li><li id="PU-02"><div class="row"><span class="id">PU-02</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Chief investment officer</span></div><h4>Identify beneficiaries and their order of priority</h4><p>Who the assets serve and whose claim comes first when objectives conflict.</p><div class="ref bp">PMP s5.1.2; IPS s3e example on the exclusive benefit of beneficiaries; Practitioner practice for the priority order</div></li><li id="PU-03"><div class="row"><span class="id">PU-03</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Governing board</span></div><h4>Define the capital objectives</h4><p>Relate the purpose of the assets to one or more broad objectives. For a strategic holding this is the reason to hold and the triggers that would end it.</p><div class="ref">IPS s3a</div></li><li id="PU-04"><div class="row"><span class="id">PU-04</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Governing board</span></div><h4>Set governance and delegation</h4><p>Who approves, who executes, who monitors, and who hires and dismisses external managers. Mandates where the owner also decides need written limits on behavioral risk, such as a cooling-off rule for unplanned changes.</p><div class="ref">IPS s1b, s2a, s2c, s2d</div></li><li id="PU-05"><div class="row"><span class="id">PU-05</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Chief investment officer</span></div><h4>Choose the portfolio architecture</h4><p>Parallel objectives get separate sub-portfolios. Compound objectives stay in one pool with every filter applied to it.</p><div class="ref bp">PAA summary on goals-based sub-portfolios; Practitioner practice</div></li><li id="PU-06"><div class="row"><span class="id">PU-06</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Chief investment officer</span></div><h4>Draft the mandate statement</h4><p>One document that brings the investor, beneficiaries, objectives, governance and architecture together.</p><div class="ref">IPS s1a, s1b</div></li><li id="PU-D1"><div class="row"><span class="id">PU-D1</span><span class="chip" style="background:#EBE5F3;color:#4B3576"><i style="background:#4B3576"></i>Decision gate</span><span class="own">Governing board</span></div><h4>Approve the mandate?</h4><p>The board approves the mandate or sends it back with reasons.</p><div class="ref">IPS s1b, s2a</div></li></ol></div></section>
+<section class="phase" id="RU"><div class="ph-head"><div class="badge">2</div><div><div class="kick">Step 02</div><h2>Define Rules in the Investment Policy Statement</h2></div></div>
+<div class="authority"><span class="l">What good looks like</span>The IPS states return and risk objectives and five constraints. These are liquidity, time horizon, tax, legal and regulatory limits, and unique circumstances. It also sets benchmarks, the ESG and stewardship policy and the rebalancing rules. The investment committee or the client approves it.</div>
+<div class="anchors"><b>Standard anchors</b> · IPS s2b, s2f, s3a to s3e, s4c; PMP s5.1.1, s5.1.2; GS-BM; GIPS-AO 21.A.15; UKSC 2026; TPR LDI</div>
+<div class="ph-body"><figure class="diagram"><pre class="mermaid">flowchart TD
+  classDef llm fill:#E2EFE6,stroke:#9CC3A8,color:#1E3A28,stroke-width:1px
+  classDef hyb fill:#F6EDD6,stroke:#D9C38A,color:#4A3609,stroke-width:1px
+  classDef hum fill:#F6E3DF,stroke:#DDAFA5,color:#5C1F16,stroke-width:1px
+  classDef gate fill:#EBE5F3,stroke:#B7A6D6,color:#33244F,stroke-width:1px
+  classDef par fill:#E3EBF4,stroke:#9FB6D3,color:#1F3A5F,stroke-width:1px
+  classDef ext fill:#FAF8F4,stroke:#BDB6A8,color:#5D6B7A,stroke-dasharray:4 3
+  classDef term fill:#13202F,stroke:#13202F,color:#F7F5F0
+  RU_D1{&quot;RU-D1: Which objective type?&quot;}:::gate
+  RU_P1{{&quot;RU-P1: Liability profile&quot;}}:::par
+  RU_01[&quot;RU-01: Set the return objective&quot;]:::hyb
+  RU_02[&quot;RU-02: Set risk tolerance and the risk budget&quot;]:::hyb
+  RU_03[&quot;RU-03: Set the time horizon and evaluation horizon&quot;]:::hyb
+  RU_04[&quot;RU-04: Set liquidity, tax, leverage and currency limits&quot;]:::hyb
+  RU_P2{{&quot;RU-P2: Legal and regulatory limits&quot;}}:::par
+  RU_05[&quot;RU-05: Record unique circumstances and advantages&quot;]:::hyb
+  RU_06[&quot;RU-06: Set the ESG, exclusion and stewardship policy&quot;]:::hyb
+  RU_07[&quot;RU-07: Select benchmarks&quot;]:::hyb
+  RU_08[&quot;RU-08: Set the rebalancing policy and review cycle&quot;]:::hyb
+  RU_09[&quot;RU-09: Draft the investment policy statement&quot;]:::hyb
+  RU_D2{&quot;RU-D2: Approve the IPS?&quot;}:::gate
+  PU[[&quot;Step 1&lt;br/&gt;Define Purpose&quot;]]:::ext
+  PU --&gt; RU_D1
+  RU_D1 --&gt;|A. Benchmark-relative| RU_01
+  RU_D1 --&gt;|B. Absolute return| RU_01
+  RU_D1 --&gt;|C. Liability-driven| RU_P1
+  RU_D1 --&gt;|D. Per sub-portfolio| RU_01
+  RU_D1 --&gt;|E. Strategic holding| RU_02
+  RU_P1 --&gt; RU_01
+  RU_01 --&gt; RU_02
+  RU_02 --&gt; RU_03
+  RU_03 --&gt; RU_04
+  RU_04 --&gt; RU_P2
+  RU_P2 --&gt; RU_05
+  RU_05 --&gt; RU_06
+  RU_06 --&gt; RU_07
+  RU_07 --&gt; RU_08
+  RU_08 --&gt; RU_09
+  RU_09 --&gt; RU_D2
+  OP[[&quot;Step 3&lt;br/&gt;Map the Opportunity Set&quot;]]:::ext
+  RU_D2 --&gt;|Approved| OP
+  RU_D2 --&gt;|Revise| RU_01</pre></figure><ol class="tasks"><li id="RU-D1"><div class="row"><span class="id">RU-D1</span><span class="chip" style="background:#EBE5F3;color:#4B3576"><i style="background:#4B3576"></i>Decision gate</span><span class="own">Investment committee</span></div><h4>Which objective type?</h4><p>Five routes set what the rules must cover. A is return-seeking against a benchmark, B is absolute return, C is liability-driven, D has multiple objectives and runs this step once per sub-portfolio, and E is a strategic holding.</p><div class="ref">PMP s5.1.1; PAA introduction</div></li><li id="RU-P1"><div class="row"><span class="id">RU-P1</span><span class="chip" style="background:#E3EBF4;color:#1F3A5F"><i style="background:#1F3A5F"></i>External parameter</span><span class="own">Actuary</span></div><h4>Liability profile</h4><p>Read from the latest actuarial valuation. Cash flows, duration, inflation linkage and the funding position. The portfolio team does not choose them.</p><div class="ref">PAA summary on liability characteristics; TPR LDI investment strategy</div></li><li id="RU-01"><div class="row"><span class="id">RU-01</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Chief investment officer</span></div><h4>Set the return objective</h4><p>The required return and how it relates to spending, inflation or liabilities. Route B states a target return over a stated period.</p><div class="ref">IPS s3b; PMP s6.1.2</div></li><li id="RU-02"><div class="row"><span class="id">RU-02</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Chief investment officer</span></div><h4>Set risk tolerance and the risk budget</h4><p>Ability and willingness to bear risk, the largest tolerable loss, and the absolute and active risk budgets. The risk budget is approved with the IPS at RU-D2, or by the board where the IPS reserves it. Route E sets downside limits only.</p><div class="ref">IPS s3c, s2f; PMP s6.1.1; PAA learning outcomes on risk budgets</div></li><li id="RU-03"><div class="row"><span class="id">RU-03</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Chief investment officer</span></div><h4>Set the time horizon and evaluation horizon</h4><p>The investment horizon, any stages within it, and the minimum period before underperformance triggers action. Illiquid sleeves get a longer evaluation period.</p><div class="ref">IPS s3d; PMP s5.1.1, s6.2.2</div></li><li id="RU-04"><div class="row"><span class="id">RU-04</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Chief investment officer</span></div><h4>Set liquidity, tax, leverage and currency limits</h4><p>Cash needs and the liquid floor, tax treatment, leverage and derivative limits, foreign asset limits and the currency hedging policy.</p><div class="ref">IPS s3d; PMP s5.1.1, s6.2.1, s6.2.3</div></li><li id="RU-P2"><div class="row"><span class="id">RU-P2</span><span class="chip" style="background:#E3EBF4;color:#1F3A5F"><i style="background:#1F3A5F"></i>External parameter</span><span class="own">Compliance officer</span></div><h4>Legal and regulatory limits</h4><p>Read from law, the regulator and the governing documents. Eligible assets, concentration caps and prudence rules. Compliance confirms them and the portfolio team does not set them.</p><div class="ref">PMP s5.1.1, s6.2.4; IPS s3d</div></li><li id="RU-05"><div class="row"><span class="id">RU-05</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Chief investment officer</span></div><h4>Record unique circumstances and advantages</h4><p>Restrictions particular to this investor and any lasting advantages it holds, such as a long horizon, a sponsor&#x27;s support or access to private deals.</p><div class="ref bp">PMP s5.1.1, s6.2.5; Practitioner practice for advantages</div></li><li id="RU-06"><div class="row"><span class="id">RU-06</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Chief investment officer</span></div><h4>Set the ESG, exclusion and stewardship policy</h4><p>Whether ESG factors are used and how. Exclusions, proxy voting authority, engagement and escalation, and any securities lending limits.</p><div class="ref bp">IPS s3e; UKSC 2026; Practitioner practice for escalation</div></li><li id="RU-07"><div class="row"><span class="id">RU-07</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Chief investment officer</span></div><h4>Select benchmarks</h4><p>A policy benchmark for the total fund and one per asset class. Each is specified in advance, relevant, measurable, investable and complete where possible. Route B uses a target return. Route E records that no benchmark is appropriate and why. The total fund policy benchmark still carries the holding, at its actual or target return.</p><div class="ref">IPS s3b; GS-BM valid benchmark characteristics; GIPS-AO 21.A.15</div></li><li id="RU-08"><div class="row"><span class="id">RU-08</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Chief investment officer</span></div><h4>Set the rebalancing policy and review cycle</h4><p>Ranges around each target, calendar or threshold triggers, who may rebalance without the committee, and how often the IPS itself is reviewed.</p><div class="ref">IPS s4c, s2b; PAA summary on corridor width; Vanguard 2015</div></li><li id="RU-09"><div class="row"><span class="id">RU-09</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Chief investment officer</span></div><h4>Draft the investment policy statement</h4><p>A model drafts the IPS from the approved inputs. The CIO checks it against the mandate and every constraint.</p><div class="ref">IPS all sections; PMP s5.1.2</div></li><li id="RU-D2"><div class="row"><span class="id">RU-D2</span><span class="chip" style="background:#EBE5F3;color:#4B3576"><i style="background:#4B3576"></i>Decision gate</span><span class="own">Investment committee or client</span></div><h4>Approve the IPS?</h4><p>The committee or the client approves the IPS, or sends it back with the points to change.</p><div class="ref">IPS s2a, s1b</div></li></ol></div></section>
+<section class="phase" id="OP"><div class="ph-head"><div class="badge">3</div><div><div class="kick">Step 03</div><h2>Map the Opportunity Set</h2></div></div>
+<div class="authority"><span class="l">What good looks like</span>The eligible universe follows from the approved IPS. Every asset class on the list needs a benchmark, a valuation method and a working route for custody and settlement before money goes in.</div>
+<div class="anchors"><b>Standard anchors</b> · IPS s3b, s3d; GIPS-F 2.A.19 to 2.A.21 valuation; Practitioner practice</div>
+<div class="ph-body"><figure class="diagram"><pre class="mermaid">flowchart TD
+  classDef llm fill:#E2EFE6,stroke:#9CC3A8,color:#1E3A28,stroke-width:1px
+  classDef hyb fill:#F6EDD6,stroke:#D9C38A,color:#4A3609,stroke-width:1px
+  classDef hum fill:#F6E3DF,stroke:#DDAFA5,color:#5C1F16,stroke-width:1px
+  classDef gate fill:#EBE5F3,stroke:#B7A6D6,color:#33244F,stroke-width:1px
+  classDef par fill:#E3EBF4,stroke:#9FB6D3,color:#1F3A5F,stroke-width:1px
+  classDef ext fill:#FAF8F4,stroke:#BDB6A8,color:#5D6B7A,stroke-dasharray:4 3
+  classDef term fill:#13202F,stroke:#13202F,color:#F7F5F0
+  OP_01[&quot;OP-01: List eligible asset classes&quot;]:::hyb
+  OP_02[&quot;OP-02: List instruments, vehicles and deal types&quot;]:::hyb
+  OP_03[&quot;OP-03: List markets, geographies and sourcing channels&quot;]:::llm
+  OP_04[&quot;OP-04: List eligible strategies&quot;]:::hyb
+  OP_05[&quot;OP-05: Check operational readiness&quot;]:::hyb
+  OP_06[&quot;OP-06: Formalize the eligible universe&quot;]:::hyb
+  RU[[&quot;Step 2&lt;br/&gt;Define Rules in the&lt;br/&gt;Investment Policy&lt;br/&gt;Statement&quot;]]:::ext
+  RU --&gt; OP_01
+  OP_01 --&gt; OP_02
+  OP_02 --&gt; OP_03
+  OP_03 --&gt; OP_04
+  OP_04 --&gt; OP_05
+  OP_05 --&gt; OP_06
+  ME[[&quot;Step 4&lt;br/&gt;Choose the Selection or&lt;br/&gt;Allocation Methodology&quot;]]:::ext
+  OP_06 --&gt;|Routes A to D| ME
+  EX_01[[&quot;EX-01: Plan the execution strategy&quot;]]:::ext
+  OP_06 --&gt;|Route E, hold| EX_01</pre></figure><ol class="tasks"><li id="OP-01"><div class="row"><span class="id">OP-01</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Chief investment officer</span></div><h4>List eligible asset classes</h4><p>Every permissible asset class with a short description and its benchmark, including classes not used today.</p><div class="ref">IPS s3b</div></li><li id="OP-02"><div class="row"><span class="id">OP-02</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Portfolio manager</span></div><h4>List instruments, vehicles and deal types</h4><p>Securities, funds, separate accounts, co-investments and derivatives, within the leverage and securities lending limits.</p><div class="ref">IPS s3d, s3e</div></li><li id="OP-03"><div class="row"><span class="id">OP-03</span><span class="chip" style="background:#E2EFE6;color:#2D5F3D"><i style="background:#2D5F3D"></i>Model-run</span><span class="own">Portfolio manager</span></div><h4>List markets, geographies and sourcing channels</h4><p>A model compiles the market list against the foreign investment and currency limits. The owner samples it.</p><div class="ref">IPS s3d</div></li><li id="OP-04"><div class="row"><span class="id">OP-04</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Portfolio manager</span></div><h4>List eligible strategies</h4><p>Passive, active and enhanced index approaches by sleeve. New asset types that span several classes are filed by their main economic function, with cross-references.</p><div class="ref">PMP s5.1.2</div></li><li id="OP-05"><div class="row"><span class="id">OP-05</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Operations lead</span></div><h4>Check operational readiness</h4><p>Custody, pricing and valuation source, legal eligibility and settlement route for each new asset type. Digital assets need a qualified custodian and a tested way to settle.</p><div class="ref bp">Practitioner practice; GIPS-F 2.A.19 to 2.A.21 on fair value</div></li><li id="OP-06"><div class="row"><span class="id">OP-06</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Chief investment officer</span></div><h4>Formalize the eligible universe</h4><p>The approved list. The IPS names every permissible asset class, so a class it does not already permit needs an IPS change approved by the committee before it is added.</p><div class="ref">IPS s3b, s2a</div></li></ol></div></section>
+<section class="phase" id="ME"><div class="ph-head"><div class="badge">4</div><div><div class="kick">Step 04</div><h2>Choose the Selection or Allocation Methodology</h2></div></div>
+<div class="authority"><span class="l">What good looks like</span>The strategic allocation combines the IPS with capital market expectations. Recognized methods include constrained mean-variance, risk budgeting and risk parity, factor-based, liability-relative and goals-based allocation. Each sleeve then follows a discretionary, systematic or liability-matching route.</div>
+<div class="anchors"><b>Standard anchors</b> · PMP s5.1.3, s5.1.4, s5.2; PAA introduction and summary; IPS s2e; TPR LDI</div>
+<div class="ph-body"><figure class="diagram"><pre class="mermaid">flowchart TD
+  classDef llm fill:#E2EFE6,stroke:#9CC3A8,color:#1E3A28,stroke-width:1px
+  classDef hyb fill:#F6EDD6,stroke:#D9C38A,color:#4A3609,stroke-width:1px
+  classDef hum fill:#F6E3DF,stroke:#DDAFA5,color:#5C1F16,stroke-width:1px
+  classDef gate fill:#EBE5F3,stroke:#B7A6D6,color:#33244F,stroke-width:1px
+  classDef par fill:#E3EBF4,stroke:#9FB6D3,color:#1F3A5F,stroke-width:1px
+  classDef ext fill:#FAF8F4,stroke:#BDB6A8,color:#5D6B7A,stroke-dasharray:4 3
+  classDef term fill:#13202F,stroke:#13202F,color:#F7F5F0
+  ME_01[&quot;ME-01: Form capital market expectations&quot;]:::hyb
+  ME_02[&quot;ME-02: Choose the allocation framework&quot;]:::hyb
+  ME_03[&quot;ME-03: Set tactical and dynamic adjustment rules&quot;]:::hyb
+  ME_D1{&quot;ME-D1: Which method for this sleeve?&quot;}:::gate
+  ME_04[&quot;ME-04: Set the selection criteria&quot;]:::hyb
+  ME_05[&quot;ME-05: Specify and validate the systematic model&quot;]:::hyb
+  ME_06[&quot;ME-06: Design the liability hedge&quot;]:::hyb
+  ME_07[&quot;ME-07: Formalize the allocation model&quot;]:::hyb
+  OP[[&quot;Step 3&lt;br/&gt;Map the Opportunity Set&quot;]]:::ext
+  OP --&gt; ME_01
+  MO[[&quot;Step 7&lt;br/&gt;Monitor and Adapt&quot;]]:::ext
+  MO --&gt; ME_01
+  ME_01 --&gt; ME_02
+  ME_02 --&gt; ME_03
+  ME_03 --&gt; ME_D1
+  ME_D1 --&gt;|X. Discretionary| ME_04
+  ME_D1 --&gt;|Y. Systematic| ME_05
+  ME_D1 --&gt;|Z. Liability-matching| ME_06
+  ME_04 --&gt; ME_07
+  DP_01[[&quot;DP-01: Source opportunities&quot;]]:::ext
+  ME_04 --&gt;|Illiquid deals| DP_01
+  ME_05 --&gt; ME_07
+  ME_06 --&gt; ME_07
+  CO[[&quot;Step 5&lt;br/&gt;Construct the Portfolio&quot;]]:::ext
+  ME_07 --&gt; CO</pre></figure><ol class="tasks"><li id="ME-01"><div class="row"><span class="id">ME-01</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Chief investment officer</span></div><h4>Form capital market expectations</h4><p>Long-run return, volatility and correlation assumptions for each asset class. A model drafts them from stated methods and data. The CIO signs the assumptions and records who set them.</p><div class="ref">PMP s5.1.3; IPS s2e</div></li><li id="ME-02"><div class="row"><span class="id">ME-02</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Chief investment officer</span></div><h4>Choose the allocation framework</h4><p>Constrained mean-variance, Black-Litterman, risk budgeting or risk parity, factor-based, surplus or hedging plus return-seeking, or goals-based sub-portfolios. The choice is justified against the objective type.</p><div class="ref">PAA introduction and summary</div></li><li id="ME-03"><div class="row"><span class="id">ME-03</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Chief investment officer</span></div><h4>Set tactical and dynamic adjustment rules</h4><p>How far and for how long the portfolio may depart from the strategic weights, within the IPS ranges.</p><div class="ref">PMP s5.2</div></li><li id="ME-D1"><div class="row"><span class="id">ME-D1</span><span class="chip" style="background:#EBE5F3;color:#4B3576"><i style="background:#4B3576"></i>Decision gate</span><span class="own">Chief investment officer</span></div><h4>Which method for this sleeve?</h4><p>Each sleeve takes one route. Mixed funds run several sleeves on different routes.</p><div class="ref bp">PAA introduction; Practitioner practice</div></li><li id="ME-04"><div class="row"><span class="id">ME-04</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Portfolio manager</span></div><h4>Set the selection criteria</h4><p>Research and selection rules for discretionary sleeves, including manager selection where external managers are used. Illiquid deals go through the deal subprocess.</p><div class="ref">PMP s5.1.2; IPS s2c</div></li><li id="ME-05"><div class="row"><span class="id">ME-05</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Model risk lead</span></div><h4>Specify and validate the systematic model</h4><p>Rules, data, out-of-sample tests and capacity. Someone independent of the builder validates the model before it trades.</p><div class="ref bp">Practitioner practice</div></li><li id="ME-06"><div class="row"><span class="id">ME-06</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Chief investment officer</span></div><h4>Design the liability hedge</h4><p>Hedge ratios for rates and inflation, the collateral buffer and the order in which assets meet cash calls. For UK pension schemes, TPR guidance asks leveraged hedges to hold a market stress buffer of at least 250 bps on top of an operational buffer. Route C mandates use this route for their hedging sleeve.</p><div class="ref">PAA summary on hedging and return-seeking portfolios; TPR LDI collateral resilience</div></li><li id="ME-07"><div class="row"><span class="id">ME-07</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Chief investment officer</span></div><h4>Formalize the allocation model</h4><p>The framework, inputs, sleeve routes and adjustment rules in one document for the committee.</p><div class="ref">IPS s2e</div></li></ol></div></section>
+<section class="phase" id="CO"><div class="ph-head"><div class="badge">5</div><div><div class="kick">Step 05</div><h2>Construct the Portfolio</h2></div></div>
+<div class="authority"><span class="l">What good looks like</span>Construction turns the allocation model into target weights inside the IPS limits. Limits belong inside the optimizer, not after it. The investment committee approves the strategic allocation and the target portfolio before money moves.</div>
+<div class="anchors"><b>Standard anchors</b> · PMP s5.1.4, s5.2; PAA summary; IPS s2e, s3b; TPR LDI</div>
+<div class="ph-body"><figure class="diagram"><pre class="mermaid">flowchart TD
+  classDef llm fill:#E2EFE6,stroke:#9CC3A8,color:#1E3A28,stroke-width:1px
+  classDef hyb fill:#F6EDD6,stroke:#D9C38A,color:#4A3609,stroke-width:1px
+  classDef hum fill:#F6E3DF,stroke:#DDAFA5,color:#5C1F16,stroke-width:1px
+  classDef gate fill:#EBE5F3,stroke:#B7A6D6,color:#33244F,stroke-width:1px
+  classDef par fill:#E3EBF4,stroke:#9FB6D3,color:#1F3A5F,stroke-width:1px
+  classDef ext fill:#FAF8F4,stroke:#BDB6A8,color:#5D6B7A,stroke-dasharray:4 3
+  classDef term fill:#13202F,stroke:#13202F,color:#F7F5F0
+  CO_01[&quot;CO-01: Load IPS limits and operational limits into the optimizer&quot;]:::hyb
+  CO_02[&quot;CO-02: Optimize risk and return&quot;]:::llm
+  CO_03[&quot;CO-03: Set target weights, ranges and the pacing plan&quot;]:::hyb
+  CO_04[&quot;CO-04: Stress test and run scenarios&quot;]:::hyb
+  CO_05[&quot;CO-05: Estimate implementation and transaction costs&quot;]:::llm
+  CO_06[&quot;CO-06: Finalize the target portfolio&quot;]:::hyb
+  CO_D1{&quot;CO-D1: Approve the strategic allocation and target portfolio?&quot;}:::gate
+  ME[[&quot;Step 4&lt;br/&gt;Choose the Selection or&lt;br/&gt;Allocation Methodology&quot;]]:::ext
+  ME --&gt; CO_01
+  CO_01 --&gt; CO_02
+  CO_02 --&gt; CO_03
+  CO_03 --&gt; CO_04
+  CO_04 --&gt; CO_05
+  CO_05 --&gt; CO_06
+  CO_06 --&gt; CO_D1
+  EX[[&quot;Step 6&lt;br/&gt;Execute&quot;]]:::ext
+  CO_D1 --&gt;|Approved| EX
+  CO_D1 --&gt;|Revise| CO_02
+  RU[[&quot;Step 2&lt;br/&gt;Define Rules in the&lt;br/&gt;Investment Policy&lt;br/&gt;Statement&quot;]]:::ext
+  CO_D1 --&gt;|Needs an IPS change| RU</pre></figure><ol class="tasks"><li id="CO-01"><div class="row"><span class="id">CO-01</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Risk manager</span></div><h4>Load IPS limits and operational limits into the optimizer</h4><p>Weight ranges, risk budget, liquidity floor, leverage and counterparty limits. The risk manager checks every limit against the IPS.</p><div class="ref">PMP s5.1.4; PAA summary on weight constraints</div></li><li id="CO-02"><div class="row"><span class="id">CO-02</span><span class="chip" style="background:#E2EFE6;color:#2D5F3D"><i style="background:#2D5F3D"></i>Model-run</span><span class="own">Portfolio manager</span></div><h4>Optimize risk and return</h4><p>A model runs the chosen framework with the limits in place. The portfolio manager owns the run and samples the inputs and outputs.</p><div class="ref">PAA summary; PMP s5.2</div></li><li id="CO-03"><div class="row"><span class="id">CO-03</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Portfolio manager</span></div><h4>Set target weights, ranges and the pacing plan</h4><p>Targets and ranges per sleeve. Liquid sleeves can move in one step. Illiquid sleeves follow a commitment pacing plan through commitment, drawdown, holding and exit. Systematic sleeves adjust continuously.</p><div class="ref bp">IPS s3b; PAA learning outcome on asset class liquidity; Practitioner practice for commitment pacing</div></li><li id="CO-04"><div class="row"><span class="id">CO-04</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Risk manager</span></div><h4>Stress test and run scenarios</h4><p>Historic and hypothetical shocks, liquidity under stress, and collateral calls on any leveraged hedge. A model runs the shocks and proposes scenarios. The risk manager chooses the hypothetical scenarios and signs the results.</p><div class="ref">PAA learning outcomes on Monte Carlo and scenarios; TPR LDI</div></li><li id="CO-05"><div class="row"><span class="id">CO-05</span><span class="chip" style="background:#E2EFE6;color:#2D5F3D"><i style="background:#2D5F3D"></i>Model-run</span><span class="own">Head of trading</span></div><h4>Estimate implementation and transaction costs</h4><p>Commissions, spreads, market impact, taxes and the cost of trades that cannot be filled, set against the expected benefit of the move.</p><div class="ref">PMP s5.2; TMG definition of best execution; PAA summary on trading costs</div></li><li id="CO-06"><div class="row"><span class="id">CO-06</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Portfolio manager</span></div><h4>Finalize the target portfolio</h4><p>The target, the ranges, the stress results and the cost estimate in one paper for the committee.</p><div class="ref">IPS s3b</div></li><li id="CO-D1"><div class="row"><span class="id">CO-D1</span><span class="chip" style="background:#EBE5F3;color:#4B3576"><i style="background:#4B3576"></i>Decision gate</span><span class="own">Investment committee</span></div><h4>Approve the strategic allocation and target portfolio?</h4><p>The committee approves, sends it back, or finds that the target needs a change to the IPS. Where the IPS reserves the policy portfolio to the board, the committee recommends and the board approves.</p><div class="ref">IPS s2e, s3b</div></li></ol></div></section>
+<section class="phase" id="EX"><div class="ph-head"><div class="badge">6</div><div><div class="kick">Step 06</div><h2>Execute</h2></div></div>
+<div class="authority"><span class="l">What good looks like</span>Best execution means taking all sufficient steps to get the best possible result. Price, costs, speed, likelihood of execution and settlement, size and nature all count. CFA Institute&#x27;s guidelines judge it over many trades, through process, disclosure and records.</div>
+<div class="anchors"><b>Standard anchors</b> · MiFID II Art 27(1); ESMA 2024; TMG 1.A to 1.D, 2, 3; PMP s5.2</div>
+<div class="ph-body"><figure class="diagram"><pre class="mermaid">flowchart TD
+  classDef llm fill:#E2EFE6,stroke:#9CC3A8,color:#1E3A28,stroke-width:1px
+  classDef hyb fill:#F6EDD6,stroke:#D9C38A,color:#4A3609,stroke-width:1px
+  classDef hum fill:#F6E3DF,stroke:#DDAFA5,color:#5C1F16,stroke-width:1px
+  classDef gate fill:#EBE5F3,stroke:#B7A6D6,color:#33244F,stroke-width:1px
+  classDef par fill:#E3EBF4,stroke:#9FB6D3,color:#1F3A5F,stroke-width:1px
+  classDef ext fill:#FAF8F4,stroke:#BDB6A8,color:#5D6B7A,stroke-dasharray:4 3
+  classDef term fill:#13202F,stroke:#13202F,color:#F7F5F0
+  EX_01[&quot;EX-01: Plan the execution strategy&quot;]:::hyb
+  EX_02[&quot;EX-02: Run pre-trade compliance checks&quot;]:::llm
+  EX_03[&quot;EX-03: Select brokers, venues and counterparties&quot;]:::hum
+  EX_04[&quot;EX-04: Work liquid orders&quot;]:::hyb
+  EX_05[&quot;EX-05: Sign commitments and manager appointments&quot;]:::hum
+  EX_06[&quot;EX-06: Confirm, settle and reconcile&quot;]:::llm
+  EX_07[&quot;EX-07: Record the live portfolio&quot;]:::llm
+  EX_08[&quot;EX-08: Analyze transaction costs after the trade&quot;]:::llm
+  CO[[&quot;Step 5&lt;br/&gt;Construct the Portfolio&quot;]]:::ext
+  CO --&gt; EX_01
+  OP_06[[&quot;OP-06: Formalize the eligible universe&quot;]]:::ext
+  OP_06 --&gt;|Route E, hold| EX_01
+  MO_D1[[&quot;MO-D1: What adjustment is needed?&quot;]]:::ext
+  MO_D1 --&gt;|Rebalance within policy| EX_01
+  MO_06[[&quot;MO-06: Check drift against the rebalancing ranges&quot;]]:::ext
+  MO_06 --&gt;|Outside a range, rebalance under delegation| EX_01
+  MO_02[[&quot;MO-02: Monitor risk, limits and compliance&quot;]]:::ext
+  MO_02 --&gt;|Limit breach to cure| EX_01
+  EX_01 --&gt;|Trades needed| EX_02
+  EX_01 --&gt;|Route E, nothing to trade| EX_07
+  DP_D2[[&quot;DP-D2: Approve the investment on negotiated terms?&quot;]]:::ext
+  DP_D2 --&gt; EX_02
+  EX_02 --&gt;|Liquid orders| EX_03
+  EX_02 --&gt;|Commitments and appointments| EX_05
+  EX_02 --&gt;|Breach| EX_01
+  EX_03 --&gt; EX_04
+  EX_04 --&gt; EX_06
+  EX_05 --&gt; EX_06
+  EX_06 --&gt; EX_07
+  EX_07 --&gt; EX_08
+  MO[[&quot;Step 7&lt;br/&gt;Monitor and Adapt&quot;]]:::ext
+  EX_08 --&gt; MO</pre></figure><ol class="tasks"><li id="EX-01"><div class="row"><span class="id">EX-01</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Head of trading</span></div><h4>Plan the execution strategy</h4><p>Order of trades, timing, transition plan and the route for each asset type. Route E holdings take no action unless a trigger in the IPS is hit.</p><div class="ref">TMG 1.A.2, 1.A.3; PMP s5.2</div></li><li id="EX-02"><div class="row"><span class="id">EX-02</span><span class="chip" style="background:#E2EFE6;color:#2D5F3D"><i style="background:#2D5F3D"></i>Model-run</span><span class="own">Compliance officer</span></div><h4>Run pre-trade compliance checks</h4><p>Rule checks against IPS limits, restricted lists, concentration and counterparty limits before any order leaves. Only the compliance officer can clear a breach.</p><div class="ref bp">Practitioner practice; IPS s1b; TMG 1.A.6</div></li><li id="EX-03"><div class="row"><span class="id">EX-03</span><span class="chip" style="background:#F6E3DF;color:#8A2F22"><i style="background:#8A2F22"></i>Human-only</span><span class="own">Head of trading</span></div><h4>Select brokers, venues and counterparties</h4><p>Choose from the approved list by execution quality, financial strength and settlement record. Judging a counterparty stays with people.</p><div class="ref">TMG 1.B, 1.C; MiFID II Art 27(1)</div></li><li id="EX-04"><div class="row"><span class="id">EX-04</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Head of trading</span></div><h4>Work liquid orders</h4><p>The trader releases each order. Execution algorithms work it inside the trader&#x27;s limits, and the trader watches fills and market impact.</p><div class="ref">MiFID II Art 27(1); TMG 1.A</div></li><li id="EX-05"><div class="row"><span class="id">EX-05</span><span class="chip" style="background:#F6E3DF;color:#8A2F22"><i style="background:#8A2F22"></i>Human-only</span><span class="own">Authorized signatories</span></div><h4>Sign commitments and manager appointments</h4><p>Sign subscription or purchase documents and the investment management agreement for any newly appointed external manager, after investment and operational due diligence. Fund capital calls and record unfunded commitments. Only authorized signatories commit the portfolio.</p><div class="ref bp">IPS s1b, s2a, s2c; Practitioner practice</div></li><li id="EX-06"><div class="row"><span class="id">EX-06</span><span class="chip" style="background:#E2EFE6;color:#2D5F3D"><i style="background:#2D5F3D"></i>Model-run</span><span class="own">Operations lead</span></div><h4>Confirm, settle and reconcile</h4><p>Match confirmations, settle, reconcile with the custodian and check that fills were allocated fairly across accounts.</p><div class="ref bp">TMG 1.D, 3; Practitioner practice for settlement and reconciliation</div></li><li id="EX-07"><div class="row"><span class="id">EX-07</span><span class="chip" style="background:#E2EFE6;color:#2D5F3D"><i style="background:#2D5F3D"></i>Model-run</span><span class="own">Operations lead</span></div><h4>Record the live portfolio</h4><p>Positions, cost and exposures as booked. This is the start point for monitoring.</p><div class="ref bp">IPS s2f; Practitioner practice</div></li><li id="EX-08"><div class="row"><span class="id">EX-08</span><span class="chip" style="background:#E2EFE6;color:#2D5F3D"><i style="background:#2D5F3D"></i>Model-run</span><span class="own">Head of trading</span></div><h4>Analyze transaction costs after the trade</h4><p>Compare costs with the pre-trade estimate and with benchmarks by broker, venue and method. Results feed broker reviews. The 2024 MiFID II review deletes the annual top five venue report, but the duty to monitor execution quality remains.</p><div class="ref">TMG 1.A.5, 1.C; MiFID II Art 27(7); ESMA 2024; PMP s5.2</div></li></ol></div></section>
+<section class="phase" id="MO"><div class="ph-head"><div class="badge">7</div><div><div class="kick">Step 07</div><h2>Monitor and Adapt</h2></div></div>
+<div class="authority"><span class="l">What good looks like</span>Feedback has two parts. Monitoring and rebalancing keep the portfolio inside the IPS. Performance evaluation measures, attributes and appraises results. Returns follow GIPS, with time-weighted returns for the total fund.</div>
+<div class="anchors"><b>Standard anchors</b> · PMP s5.3.1, s5.3.2; IPS s2b, s2c, s2f, s4a to s4c; GIPS-AO 21.A.25, 21.A.26; GIPS-F 1.A.35; UKSC 2026; Vanguard 2015</div>
+<div class="ph-body"><figure class="diagram"><pre class="mermaid">flowchart TD
+  classDef llm fill:#E2EFE6,stroke:#9CC3A8,color:#1E3A28,stroke-width:1px
+  classDef hyb fill:#F6EDD6,stroke:#D9C38A,color:#4A3609,stroke-width:1px
+  classDef hum fill:#F6E3DF,stroke:#DDAFA5,color:#5C1F16,stroke-width:1px
+  classDef gate fill:#EBE5F3,stroke:#B7A6D6,color:#33244F,stroke-width:1px
+  classDef par fill:#E3EBF4,stroke:#9FB6D3,color:#1F3A5F,stroke-width:1px
+  classDef ext fill:#FAF8F4,stroke:#BDB6A8,color:#5D6B7A,stroke-dasharray:4 3
+  classDef term fill:#13202F,stroke:#13202F,color:#F7F5F0
+  MO_01[&quot;MO-01: Measure performance&quot;]:::llm
+  MO_02[&quot;MO-02: Monitor risk, limits and compliance&quot;]:::llm
+  MO_03[&quot;MO-03: Attribute performance&quot;]:::llm
+  MO_04[&quot;MO-04: Review external managers and stewardship outcomes&quot;]:::hum
+  MO_05[&quot;MO-05: Reassess investor circumstances, markets and benchmarks&quot;]:::hyb
+  MO_06[&quot;MO-06: Check drift against the rebalancing ranges&quot;]:::llm
+  MO_07[&quot;MO-07: Report to the investment committee and stakeholders&quot;]:::hyb
+  MO_D1{&quot;MO-D1: What adjustment is needed?&quot;}:::gate
+  EX[[&quot;Step 6&lt;br/&gt;Execute&quot;]]:::ext
+  EX --&gt; MO_01
+  MO_01 --&gt; MO_02
+  MO_02 --&gt; MO_03
+  MO_03 --&gt; MO_04
+  MO_04 --&gt; MO_05
+  MO_05 --&gt; MO_06
+  MO_06 --&gt;|Report| MO_07
+  MO_07 --&gt; MO_D1
+  EX_01[[&quot;EX-01: Plan the execution strategy&quot;]]:::ext
+  MO_02 --&gt;|Limit breach to cure| EX_01
+  MO_06 --&gt;|Outside a range, rebalance under delegation| EX_01
+  END_CYCLE([&quot;End of cycle. Next scheduled&lt;br/&gt;review&quot;]):::term
+  MO_D1 --&gt;|No change| END_CYCLE
+  MO_D1 --&gt;|Rebalance within policy| EX_01
+  ME[[&quot;Step 4&lt;br/&gt;Choose the Selection or&lt;br/&gt;Allocation Methodology&quot;]]:::ext
+  MO_D1 --&gt;|Significant, change strategy or method| ME
+  PU[[&quot;Step 1&lt;br/&gt;Define Purpose&quot;]]:::ext
+  MO_D1 --&gt;|Fundamental, review the mandate| PU</pre></figure><ol class="tasks"><li id="MO-01"><div class="row"><span class="id">MO-01</span><span class="chip" style="background:#E2EFE6;color:#2D5F3D"><i style="background:#2D5F3D"></i>Model-run</span><span class="own">Performance analyst</span></div><h4>Measure performance</h4><p>Time-weighted returns for the total fund, which GIPS requires of asset owners. Money-weighted returns may be added and suit private market sleeves. A firm reporting to clients may show money-weighted returns only if it controls the cash flows and the strategy is closed-end, fixed life, fixed commitment or mainly illiquid. Gross and net of fees against each benchmark.</p><div class="ref">GIPS-AO 21.A.25, 21.A.26; GIPS-F 1.A.35</div></li><li id="MO-02"><div class="row"><span class="id">MO-02</span><span class="chip" style="background:#E2EFE6;color:#2D5F3D"><i style="background:#2D5F3D"></i>Model-run</span><span class="own">Risk manager</span></div><h4>Monitor risk, limits and compliance</h4><p>Risk against the budget, tracking error, liquidity, leverage and every IPS limit. A breach goes to the risk manager and the compliance officer the same day, and a breach that needs trades goes straight to execution.</p><div class="ref">IPS s2f, s4b</div></li><li id="MO-03"><div class="row"><span class="id">MO-03</span><span class="chip" style="background:#E2EFE6;color:#2D5F3D"><i style="background:#2D5F3D"></i>Model-run</span><span class="own">Performance analyst</span></div><h4>Attribute performance</h4><p>Allocation, selection and timing effects for the total fund and each manager, and factor exposures where a risk model is used.</p><div class="ref">PMP s5.3.2; IPS s4b</div></li><li id="MO-04"><div class="row"><span class="id">MO-04</span><span class="chip" style="background:#F6E3DF;color:#8A2F22"><i style="background:#8A2F22"></i>Human-only</span><span class="own">Chief investment officer</span></div><h4>Review external managers and stewardship outcomes</h4><p>Whether each manager still fits its mandate, and what voting and engagement achieved. A model compiles the data. The judgment on each manager stays with people.</p><div class="ref">IPS s2c; UKSC 2026</div></li><li id="MO-05"><div class="row"><span class="id">MO-05</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Chief investment officer</span></div><h4>Reassess investor circumstances, markets and benchmarks</h4><p>Changes in the investor&#x27;s needs, in capital market expectations, and in whether each benchmark is still a fair measure.</p><div class="ref">PMP s5.3.1, s5.3.2; IPS s2b</div></li><li id="MO-06"><div class="row"><span class="id">MO-06</span><span class="chip" style="background:#E2EFE6;color:#2D5F3D"><i style="background:#2D5F3D"></i>Model-run</span><span class="own">Portfolio manager</span></div><h4>Check drift against the rebalancing ranges</h4><p>Compare weights with targets and ranges on the calendar or threshold set in the IPS. A sleeve outside its range goes straight to execution under the CIO&#x27;s delegated authority, and the committee sees it in the next report.</p><div class="ref">IPS s4c; Vanguard 2015; PAA summary on corridors</div></li><li id="MO-07"><div class="row"><span class="id">MO-07</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Chief investment officer</span></div><h4>Report to the investment committee and stakeholders</h4><p>Returns, attribution, risk, breaches, drift, manager and stewardship reviews and a recommended action. A model drafts it and the CIO signs.</p><div class="ref">IPS s4a, s2b</div></li><li id="MO-D1"><div class="row"><span class="id">MO-D1</span><span class="chip" style="background:#EBE5F3;color:#4B3576"><i style="background:#4B3576"></i>Decision gate</span><span class="own">Investment committee</span></div><h4>What adjustment is needed?</h4><p>Decided on the report and minuted. Range breaches were already rebalanced under delegation. The committee can still order a rebalance within policy, change the strategy or method, or send the mandate to the board.</p><div class="ref">PMP s5.3.1; IPS s2b, s4c</div></li></ol></div></section>
+<section class="phase" id="DP"><div class="ph-head"><div class="badge sub">SUB</div><div><div class="kick">Subprocess</div><h2>Illiquid Deal Process</h2></div></div>
+<div class="authority"><span class="l">What good looks like</span>Private deals for discretionary sleeves. The committee releases due diligence spend at one gate and approves negotiated terms at a second. Valuation follows current fair value guidance.</div>
+<div class="anchors"><b>Standard anchors</b> · IPEV 2025; IPS s2a; Practitioner practice</div>
+<div class="ph-body"><figure class="diagram"><pre class="mermaid">flowchart TD
+  classDef llm fill:#E2EFE6,stroke:#9CC3A8,color:#1E3A28,stroke-width:1px
+  classDef hyb fill:#F6EDD6,stroke:#D9C38A,color:#4A3609,stroke-width:1px
+  classDef hum fill:#F6E3DF,stroke:#DDAFA5,color:#5C1F16,stroke-width:1px
+  classDef gate fill:#EBE5F3,stroke:#B7A6D6,color:#33244F,stroke-width:1px
+  classDef par fill:#E3EBF4,stroke:#9FB6D3,color:#1F3A5F,stroke-width:1px
+  classDef ext fill:#FAF8F4,stroke:#BDB6A8,color:#5D6B7A,stroke-dasharray:4 3
+  classDef term fill:#13202F,stroke:#13202F,color:#F7F5F0
+  DP_01[&quot;DP-01: Source opportunities&quot;]:::hyb
+  DP_02[&quot;DP-02: Screen against the mandate&quot;]:::hyb
+  DP_03[&quot;DP-03: Preliminary due diligence&quot;]:::hyb
+  DP_D1{&quot;DP-D1: Proceed to detailed due diligence?&quot;}:::gate
+  DP_04[&quot;DP-04: Detailed due diligence&quot;]:::hyb
+  DP_05[&quot;DP-05: Value the investment&quot;]:::hyb
+  DP_06[&quot;DP-06: Negotiate terms&quot;]:::hum
+  DP_D2{&quot;DP-D2: Approve the investment on negotiated terms?&quot;}:::gate
+  ME_04[[&quot;ME-04: Set the selection criteria&quot;]]:::ext
+  ME_04 --&gt; DP_01
+  DP_01 --&gt; DP_02
+  DP_02 --&gt; DP_03
+  DP_03 --&gt; DP_D1
+  DP_D1 --&gt;|Proceed| DP_04
+  DP_D1 --&gt;|More work| DP_03
+  END_DECL([&quot;Deal declined and archived&quot;]):::term
+  DP_D1 --&gt;|Decline| END_DECL
+  DP_04 --&gt; DP_05
+  DP_05 --&gt; DP_06
+  DP_06 --&gt; DP_D2
+  EX_02[[&quot;EX-02: Run pre-trade compliance checks&quot;]]:::ext
+  DP_D2 --&gt;|Approved| EX_02
+  DP_D2 --&gt;|Rework terms| DP_06
+  DP_D2 --&gt;|Decline| END_DECL</pre></figure><ol class="tasks"><li id="DP-01"><div class="row"><span class="id">DP-01</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Deal team lead</span></div><h4>Source opportunities</h4><p>A model scans the pipeline against the selection criteria. The deal lead decides which to pursue.</p><div class="ref bp">Practitioner practice</div></li><li id="DP-02"><div class="row"><span class="id">DP-02</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Deal team lead</span></div><h4>Screen against the mandate</h4><p>Eligibility, exclusions, size, sector and concentration. A model drafts the screening note.</p><div class="ref bp">IPS s3b, s3e; Practitioner practice</div></li><li id="DP-03"><div class="row"><span class="id">DP-03</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Deal team lead</span></div><h4>Preliminary due diligence</h4><p>Key risks, a first view of value and the cost of full due diligence.</p><div class="ref bp">Practitioner practice</div></li><li id="DP-D1"><div class="row"><span class="id">DP-D1</span><span class="chip" style="background:#EBE5F3;color:#4B3576"><i style="background:#4B3576"></i>Decision gate</span><span class="own">Investment committee</span></div><h4>Proceed to detailed due diligence?</h4><p>Release the due diligence budget, ask for more work, or decline.</p><div class="ref bp">IPS s2a; Practitioner practice</div></li><li id="DP-04"><div class="row"><span class="id">DP-04</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Deal team lead</span></div><h4>Detailed due diligence</h4><p>Commercial, financial, legal, tax, ESG and operational work with external advisers. A model drafts summaries, and each adviser signs its own report.</p><div class="ref bp">Practitioner practice</div></li><li id="DP-05"><div class="row"><span class="id">DP-05</span><span class="chip" style="background:#F6EDD6;color:#7A5A12"><i style="background:#7A5A12"></i>Hybrid</span><span class="own">Valuation lead</span></div><h4>Value the investment</h4><p>Fair value and the price range, using methods consistent with the valuation guidelines.</p><div class="ref">IPEV 2025</div></li><li id="DP-06"><div class="row"><span class="id">DP-06</span><span class="chip" style="background:#F6E3DF;color:#8A2F22"><i style="background:#8A2F22"></i>Human-only</span><span class="own">Deal team lead</span></div><h4>Negotiate terms</h4><p>Price, structure, governance rights and conditions. Negotiation with a counterparty stays with people.</p><div class="ref bp">Practitioner practice</div></li><li id="DP-D2"><div class="row"><span class="id">DP-D2</span><span class="chip" style="background:#EBE5F3;color:#4B3576"><i style="background:#4B3576"></i>Decision gate</span><span class="own">Investment committee</span></div><h4>Approve the investment on negotiated terms?</h4><p>Final approval on the negotiated terms, a request to rework them, or a decline.</p><div class="ref">IPS s2a</div></li></ol></div></section>
+<section class="block" id="sources"><div class="eyebrow">References</div><h2 class="sec">Sources</h2>
+<p class="secnote">Public documents the map is anchored to. Each one was read for this revision. For the Stewardship Code and the IPEV Guidelines, the publisher&#x27;s release was read rather than the full text.</p>
+<ul class="srcs"><li><b>IPS</b>CFA Institute, Elements of an Investment Policy Statement for Institutional Investors (2010)</li><li><b>PMP</b>CFA Institute, The Portfolio Management Process and the Investment Policy Statement, refresher reading (2018)</li><li><b>PAA</b>CFA Institute, Principles of Asset Allocation, refresher reading (2026)</li><li><b>GIPS-F</b>GIPS Standards for Firms, 2020 edition</li><li><b>GIPS-AO</b>GIPS Standards for Asset Owners, 2020 edition</li><li><b>GS-BM</b>GIPS Guidance Statement on Benchmarks for Asset Owners (2023)</li><li><b>TMG</b>CFA Institute Trade Management Guidelines</li><li><b>MiFID II</b>Directive 2014/65/EU, Article 27, best execution</li><li><b>ESMA 2024</b>ESMA public statement on RTS 28 reports (13 February 2024)</li><li><b>TPR LDI</b>The Pensions Regulator, Using leveraged liability-driven investment (April 2023)</li><li><b>UKSC 2026</b>FRC, UK Stewardship Code 2026 (applies from 1 January 2026), as set out in the FRC release of 3 June 2025</li><li><b>IPEV 2025</b>IPEV Board, International Private Equity and Venture Capital Valuation Guidelines, December 2025 edition (release of 11 December 2025)</li><li><b>Vanguard 2015</b>Vanguard Research, Best practices for portfolio rebalancing (2015)</li></ul></section>
+<section class="block" id="questions"><div class="eyebrow">For reviewers</div><h2 class="sec">Open questions for practitioners</h2>
+<p class="secnote">The map follows the standards closely, but some choices rest on judgment. These are the ones where an experienced CIO can improve it most.</p>
+<ol class="tasks qs"><li><h4>Should routine rebalancing inside the ranges go straight to trading?</h4><p>A sleeve outside its range goes from MO-06 to EX-01 under the CIO&#x27;s delegated authority, and the committee sees it afterwards in MO-07. Some committees want to approve every rebalance first. Which is closer to practice for a multi-asset fund?</p></li><li><h4>Where should the illiquid deal process sit?</h4><p>It branches from the selection criteria in Step 4 and returns at pre-trade checks in Step 6. Pacing is set in CO-03. Would a CIO rather see deals sourced against the pacing plan after construction?</p></li><li><h4>Should the liability-matching method route stay separate from the liability-driven objective route?</h4><p>Route C sets the objective and Route Z builds the hedge. Merging them would simplify the map but lose hedging sleeves inside return-seeking mandates.</p></li><li><h4>Which tasks should a model never draft, even with a person signing?</h4><p>The current split is 4 human-only, 40 model drafts and 11 model-run. Capital market expectations and the risk budget are tagged as drafts the owner signs.</p></li></ol></section>
 
-<!-- STEP 4 -->
-<div class="tab-content" id="tab-s4">
-    <div class="card">
-        <div class="card-header">
-            <h2>Step 4: Selection/Allocation Methodology</h2>
-            <span class="badge badge-amber">Decision Node 4.0</span>
-            <span class="badge badge-purple">Sleeve-Level Routing</span>
-        </div>
-        <div class="diagram-wrapper" id="dw-s4"></div>
-        <div class="diagram-actions">
-            <button class="btn" onclick="openLightbox('dw-s4')">&#x26F6; Fullscreen</button>
-            <button class="btn" onclick="copySource(4)">&#x2398; Copy Mermaid</button>
-        </div>
-    </div>
-</div>
-
-<!-- STEP 5 -->
-<div class="tab-content" id="tab-s5">
-    <div class="card">
-        <div class="card-header">
-            <h2>Step 5: Construct Portfolio</h2>
-            <span class="badge badge-blue">Universal</span>
-            <span class="badge badge-purple">3 Construction Modes</span>
-        </div>
-        <div class="diagram-wrapper" id="dw-s5"></div>
-        <div class="diagram-actions">
-            <button class="btn" onclick="openLightbox('dw-s5')">&#x26F6; Fullscreen</button>
-            <button class="btn" onclick="copySource(5)">&#x2398; Copy Mermaid</button>
-        </div>
-    </div>
-</div>
-
-<!-- STEP 6 -->
-<div class="tab-content" id="tab-s6">
-    <div class="card">
-        <div class="card-header">
-            <h2>Step 6: Execute</h2>
-            <span class="badge badge-blue">Universal</span>
-            <span class="badge badge-green">4 Sub-Steps</span>
-        </div>
-        <div class="diagram-wrapper" id="dw-s6"></div>
-        <div class="diagram-actions">
-            <button class="btn" onclick="openLightbox('dw-s6')">&#x26F6; Fullscreen</button>
-            <button class="btn" onclick="copySource(6)">&#x2398; Copy Mermaid</button>
-        </div>
-    </div>
-</div>
-
-<!-- STEP 7 -->
-<div class="tab-content" id="tab-s7">
-    <div class="card">
-        <div class="card-header">
-            <h2>Step 7: Monitor and Adapt</h2>
-            <span class="badge badge-blue">Universal</span>
-            <span class="badge badge-red">3 Feedback Tiers</span>
-        </div>
-        <div class="diagram-wrapper" id="dw-s7"></div>
-        <div class="diagram-actions">
-            <button class="btn" onclick="openLightbox('dw-s7')">&#x26F6; Fullscreen</button>
-            <button class="btn" onclick="copySource(7)">&#x2398; Copy Mermaid</button>
-        </div>
-    </div>
-</div>
-
-<!-- LEGEND -->
-<div class="tab-content" id="tab-legend">
-    <div class="card">
-        <div class="card-header"><h2>Flowchart Legend</h2></div>
-        <div class="legend-grid">
-            <div class="legend-card card">
-                <h4>Node Types</h4>
-                <div class="legend-item"><div class="legend-swatch" style="background:#E3EBF4;border-color:#9FB6D3"></div>Process Step</div>
-                <div class="legend-item"><div class="legend-swatch" style="background:#F6EDD6;border-color:#D9C38A"></div>Decision Node</div>
-                <div class="legend-item"><div class="legend-swatch" style="background:#E2EFE6;border-color:#9CC3A8"></div>Output / Document</div>
-                <div class="legend-item"><div class="legend-swatch" style="background:#F6E3DF;border-color:#DDAFA5"></div>Route E Path</div>
-                <div class="legend-item"><div class="legend-swatch" style="background:#EBE5F3;border-color:#B7A6D6"></div>Sub-Expansion</div>
-                <div class="legend-item"><div class="legend-swatch" style="background:#13202F;border-color:#13202F"></div>Terminal</div>
-            </div>
-            <div class="legend-card card">
-                <h4>Decision Nodes</h4>
-                <div class="legend-item"><strong>DN 2.0</strong> : Classify objective type, Routes A/B/C/D/E</div>
-                <div class="legend-item"><strong>Route E Check</strong> : Skip Steps 4 and 5 if non-financial hold</div>
-                <div class="legend-item"><strong>DN 4.0</strong> : Classify methodology, Routes X/Y/Z per sleeve</div>
-                <div class="legend-item"><strong>Step 7.4</strong> : Three-tier feedback decision</div>
-            </div>
-            <div class="legend-card card">
-                <h4>Edge Types</h4>
-                <div class="legend-item">Solid arrow : primary flow</div>
-                <div class="legend-item">Dotted arrow : feedback loop or conditional sub-expansion</div>
-                <div class="legend-item">Labeled edge : output document or route classification</div>
-            </div>
-            <div class="legend-card card">
-                <h4>Feedback Tiers from Step 7.4</h4>
-                <div class="legend-item"><strong>Routine</strong> : Rebalance, back to Step 5 or 6</div>
-                <div class="legend-item"><strong>Significant</strong> : Strategy change, back to Step 4</div>
-                <div class="legend-item"><strong>Fundamental</strong> : Mandate review, back to Step 1</div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<!-- LIGHTBOX -->
-<div class="lightbox" id="lightbox">
-    <div class="lightbox-controls">
-        <button onclick="lbZoom(0.2)" title="Zoom in">+</button>
-        <button onclick="lbZoom(-0.2)" title="Zoom out">&#x2212;</button>
-        <button onclick="closeLightbox()" title="Close">&#x2715;</button>
-    </div>
-    <div class="lightbox-canvas" id="lightbox-canvas"></div>
-    <div class="lightbox-zoom-info" id="zoom-info">1.0x</div>
-</div>
-
-<footer class="footer"><div class="in">
-    <span>Portfolio Construction Framework v3 : 7 Steps, H2 Full Sub-Step Expansion</span>
-    <span>Built at SpaceXAI and shared with permission. A general method with no client data.</span>
-</div></footer>
-
-
+<footer><span>Built at SpaceXAI and shared with permission. Revised in October 2026 from the original map, which is archived at <a href="./v1/">./v1/</a>.</span><span>Built from one structured spec, so every count on this page is computed.</span></footer>
+</main></div>
 <script>
-/* ============================================
-   BLOCK 1: TAB SWITCHING (zero dependencies)
-   ============================================ */
-(function() {
-    try {
-        var btns = document.querySelectorAll('.tab-btn');
-        var tabs = document.querySelectorAll('.tab-content');
-        btns.forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                btns.forEach(function(b) { b.classList.remove('active'); });
-                tabs.forEach(function(t) { t.classList.remove('active'); });
-                btn.classList.add('active');
-                var target = document.getElementById(btn.getAttribute('data-tab'));
-                if (target) target.classList.add('active');
-            });
-        });
-    } catch(e) { console.error('Tab init error:', e); }
-})();
-
-/* ============================================
-   BLOCK 2: LIGHTBOX (zero dependencies)
-   ============================================ */
-var currentZoom = 1;
-function openLightbox(wrapperId) {
-    try {
-        var wrapper = document.getElementById(wrapperId);
-        if (!wrapper) return;
-        var svg = wrapper.querySelector('svg');
-        if (!svg) { alert('Diagram not rendered. Open in a browser with internet access for Mermaid CDN.'); return; }
-        var lb = document.getElementById('lightbox');
-        var canvas = document.getElementById('lightbox-canvas');
-        var clone = svg.cloneNode(true);
-        clone.style.background = '#fff';
-        clone.style.borderRadius = '8px';
-        clone.style.display = 'block';
-        clone.style.maxWidth = 'none';
-        canvas.innerHTML = '';
-        canvas.appendChild(clone);
-        currentZoom = 1;
-        document.getElementById('zoom-info').textContent = '1.0x';
-        lb.classList.add('open');
-        document.body.style.overflow = 'hidden';
-    } catch(e) { console.error('Lightbox error:', e); }
-}
-function closeLightbox() {
-    try {
-        document.getElementById('lightbox').classList.remove('open');
-        document.body.style.overflow = '';
-        document.getElementById('lightbox-canvas').innerHTML = '';
-    } catch(e) {}
-}
-function lbZoom(delta) {
-    try {
-        currentZoom = Math.max(0.3, Math.min(4, currentZoom + delta));
-        var svg = document.getElementById('lightbox-canvas').querySelector('svg');
-        if (svg) {
-            svg.style.transform = 'scale(' + currentZoom + ')';
-            svg.style.transformOrigin = 'top left';
-        }
-        document.getElementById('zoom-info').textContent = currentZoom.toFixed(1) + 'x';
-    } catch(e) {}
-}
-(function() {
-    try {
-        var canvas = document.getElementById('lightbox-canvas');
-        canvas.addEventListener('wheel', function(e) {
-            if (!document.getElementById('lightbox').classList.contains('open')) return;
-            e.preventDefault();
-            lbZoom(e.deltaY < 0 ? 0.2 : -0.2);
-        }, { passive: false });
-        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeLightbox(); });
-        document.getElementById('lightbox').addEventListener('click', function(e) { if (e.target === document.getElementById('lightbox')) closeLightbox(); });
-    } catch(e) { console.error('Lightbox listeners error:', e); }
-})();
-
-/* ============================================
-   BLOCK 3: MERMAID SOURCES (data only)
-   ============================================ */
-var mmdSources = [];
-
-mmdSources[0] = [
-    'flowchart TD',
-    '    classDef process fill:#E3EBF4,stroke:#9FB6D3,stroke-width:1.5px,color:#13202F',
-    '    classDef decision fill:#F6EDD6,stroke:#D9C38A,stroke-width:2px,color:#13202F',
-    '    classDef output fill:#E2EFE6,stroke:#9CC3A8,stroke-width:1.5px,color:#13202F',
-    '    classDef routeE fill:#F6E3DF,stroke:#DDAFA5,stroke-width:1.5px,color:#13202F',
-    '    classDef terminal fill:#13202F,stroke:#13202F,stroke-width:2px,color:#F7F5F0',
-    '    classDef subexp fill:#EBE5F3,stroke:#B7A6D6,stroke-width:1px,color:#13202F',
-    '',
-    '    START(["START"]):::terminal',
-    '    START --> A1',
-    '',
-    '',
-    '    A6 -->|"Mandate Statement"| DN2',
-    '    DN2{"DN 2.0: Classify<br/>Objective Type"}:::decision',
-    '    DN2 -->|"Routes A/B/C/D"| B1',
-    '    DN2 -->|"Route E: Strategic Hold"| BE2',
-    '',
-    '    subgraph S2["STEP 2: DEFINE RULES"]',
-    '        B1["2.1 Return Objective"]:::process',
-    '        B2["2.2 Risk Parameters"]:::process',
-    '        B3["2.3 Time Horizon"]:::process',
-    '        B4["2.4 Constraints"]:::process',
-    '        B5["2.5 Benchmark"]:::process',
-    '        B6["2.6 Formalize Policy"]:::process',
-    '        B1 --> B2 --> B3 --> B4 --> B5 --> B6',
-    '    end',
-    '',
-    '    subgraph S2E["STEP 2: ROUTE E"]',
-    '        BE2["2.2 Risk Parameters"]:::routeE',
-    '        BE3["2.3 Time Horizon"]:::routeE',
-    '        BE4["2.4 Constraints"]:::routeE',
-    '        BE2 --> BE3 --> BE4',
-    '    end',
-    '',
-    '    B6 -->|"Investment Policy"| C1',
-    '    BE4 -->|"IPF Reduced"| C1',
-    '',
-    '    subgraph S3["STEP 3: MAP OPPORTUNITY SET"]',
-    '        C1["3.1 Asset Classes"]:::process',
-    '        C2["3.2 Instruments"]:::process',
-    '        C3["3.3 Markets"]:::process',
-    '        C4["3.4 Strategies"]:::process',
-    '        C5["3.5 Formalize Universe"]:::process',
-    '        C1 --> C2 --> C3 --> C4 --> C5',
-    '    end',
-    '',
-    '    C5 -->|"Eligible Universe"| RCHK',
-    '    RCHK{"Route E<br/>Active?"}:::decision',
-    '    RCHK -->|"No"| DN4',
-    '    RCHK -->|"Yes: Skip 4+5"| F1',
-    '',
-    '    DN4{"DN 4.0: Methodology<br/>per sleeve"}:::decision',
-    '    DN4 -->|"Route X/Y/Z"| D1',
-    '',
-    '    subgraph S4["STEP 4: METHODOLOGY"]',
-    '        D1["4.1 Allocation Framework"]:::process',
-    '        D2["4.2 Dynamic Adjustment"]:::process',
-    '        D3["4.3 Selection Criteria"]:::process',
-    '        D4["4.4 Formalize Model"]:::process',
-    '        D1 --> D2 --> D3 --> D4',
-    '    end',
-    '',
-    '    D3 -.->|"Route X Illiquid"| D31',
-    '    subgraph SUB43["4.3 SUB-EXPANSION"]',
-    '        D31["4.3.1 Origination"]:::subexp',
-    '        D32["4.3.2 Screening"]:::subexp',
-    '        D33["4.3.3 Prelim DD"]:::subexp',
-    '        D34["4.3.4 Detailed DD"]:::subexp',
-    '        D35["4.3.5 Valuation"]:::subexp',
-    '        D36["4.3.6 IC Approval"]:::subexp',
-    '        D37["4.3.7 Negotiation"]:::subexp',
-    '        D31 --> D32 --> D33 --> D34 --> D35 --> D36 --> D37',
-    '    end',
-    '',
-    '    D4 -->|"Allocation Model"| E1',
-    '',
-    '    subgraph S5["STEP 5: CONSTRUCT PORTFOLIO"]',
-    '        E1["5.1 Target Allocations"]:::process',
-    '        E2["5.2 Optimize"]:::process',
-    '        E3["5.3 Constraints"]:::process',
-    '        E4["5.4 Stress Test"]:::process',
-    '        E5["5.5 Finalize Target"]:::process',
-    '        E1 --> E2 --> E3 --> E4 --> E5',
-    '    end',
-    '',
-    '    E5 -->|"Target Portfolio"| F1',
-    '',
-    '    subgraph S6["STEP 6: EXECUTE"]',
-    '        F1["6.1 Execution Strategy"]:::process',
-    '        F2["6.2 Manage Execution"]:::process',
-    '        F3["6.3 Confirm"]:::process',
-    '        F4["6.4 Finalize Live"]:::process',
-    '        F1 --> F2 --> F3 --> F4',
-    '    end',
-    '',
-    '    F4 -->|"Live Portfolio"| G1',
-    '',
-    '    subgraph S7["STEP 7: MONITOR + ADAPT"]',
-    '        G1["7.1 Track Performance"]:::process',
-    '        G2["7.2 Attribution"]:::process',
-    '        G3["7.3 Reassess"]:::process',
-    '        G4["7.4 Adjustment Decision"]:::process',
-    '        G5["7.5 Report"]:::process',
-    '        G1 --> G2 --> G3 --> G4 --> G5',
-    '    end',
-    '',
-    '    subgraph S1["STEP 1: DEFINE PURPOSE"]',
-    '        A1["1.1 Identify Principal"]:::process',
-    '        A2["1.2 Identify Beneficiaries"]:::process',
-    '        A3["1.3 Define Capital Objectives"]:::process',
-    '        A4["1.4 Determine Governance"]:::process',
-    '        A5["1.5 Portfolio Architecture"]:::process',
-    '        A6["1.6 Formalize Mandate"]:::process',
-    '        A1 --> A2 --> A3',
-    '        A1 --> A4',
-    '        A2 --> A4',
-    '        A3 --> A5',
-    '        A4 --> A5',
-    '        A5 --> A6',
-    '    end',
-    '',
-    '    G5 --> ENDSTATE(["END / NEXT CYCLE"]):::terminal',
-    '    G4 -.->|"Routine"| E1',
-    '    G4 -.->|"Significant"| DN4',
-    '    G4 -.->|"Fundamental"| A1'
-].join('\n');
-
-mmdSources[1] = [
-    'flowchart TD',
-    '    classDef process fill:#E3EBF4,stroke:#9FB6D3,stroke-width:1.5px,color:#13202F',
-    '    classDef output fill:#E2EFE6,stroke:#9CC3A8,stroke-width:1.5px,color:#13202F',
-    '    classDef note fill:#FAF8F4,stroke:#BDB6A8,stroke-width:1px,color:#5D6B7A',
-    '',
-    '    A1["1.1 Identify Principal<br/>Principal Profile"]:::process',
-    '    A2["1.2 Identify Beneficiaries<br/>with priority hierarchy"]:::process',
-    '    A3["1.3 Define Capital Objectives<br/>Objective Statement"]:::process',
-    '    A4["1.4 Determine Governance<br/>Governance Framework"]:::process',
-    '    A5["1.5 Portfolio Architecture<br/>Mandate Architecture"]:::process',
-    '    A6["1.6 Formalize Mandate<br/>Mandate Statement"]:::output',
-    '',
-    '    N1["Self-governed mandates include<br/>behavioral risk provisions"]:::note',
-    '    N2["Parallel objectives: separate sub-portfolios<br/>Compound objectives: single track,<br/>all filters on same pool"]:::note',
-    '',
-    '    A1 --> A2 --> A3',
-    '    A1 --> A4',
-    '    A2 --> A4',
-    '    A3 --> A5',
-    '    A4 --> A5',
-    '    A5 --> A6',
-    '    A4 -.- N1',
-    '    A5 -.- N2'
-].join('\n');
-
-mmdSources[2] = [
-    'flowchart TD',
-    '    classDef process fill:#E3EBF4,stroke:#9FB6D3,stroke-width:1.5px,color:#13202F',
-    '    classDef decision fill:#F6EDD6,stroke:#D9C38A,stroke-width:2px,color:#13202F',
-    '    classDef output fill:#E2EFE6,stroke:#9CC3A8,stroke-width:1.5px,color:#13202F',
-    '    classDef routeE fill:#F6E3DF,stroke:#DDAFA5,stroke-width:1.5px,color:#13202F',
-    '',
-    '    IN[/"Mandate Statement"/]:::output',
-    '    IN --> DN2',
-    '    DN2{"DN 2.0: Classify<br/>Objective Framework"}:::decision',
-    '',
-    '    DN2 -->|"Route A"| RA["Return-Driven"]:::process',
-    '    DN2 -->|"Route B"| RB["Absolute Return"]:::process',
-    '    DN2 -->|"Route C"| RC["Liability-Driven"]:::process',
-    '    DN2 -->|"Route D"| RD["Hybrid / Multi-Obj"]:::process',
-    '    DN2 -->|"Route E"| RE["Non-Financial Hold"]:::routeE',
-    '',
-    '    RA --> B1',
-    '    RB --> B1',
-    '    RC --> B1',
-    '    RD -->|"Per sub-portfolio"| B1',
-    '',
-    '    B1["2.1 Return Objective"]:::process',
-    '    B2["2.2 Risk Parameters"]:::process',
-    '    B3["2.3 Time Horizon"]:::process',
-    '    B4["2.4 Constraints + Advantages"]:::process',
-    '    B5["2.5 Select Benchmark"]:::process',
-    '    B6["2.6 Formalize Policy"]:::output',
-    '',
-    '    B1 --> B2 --> B3 --> B4 --> B5 --> B6',
-    '',
-    '    RE -->|"Skip 2.1 + 2.5"| BE2["2.2 Risk - downside only"]:::routeE',
-    '    BE2 --> BE3["2.3 Horizon - indefinite"]:::routeE',
-    '    BE3 --> BE4["2.4 Constraints"]:::routeE',
-    '    BE4 --> B6R["IPF Reduced Scope"]:::output',
-    '',
-    '    B6 --> OUT[/"To Step 3"/]:::output',
-    '    B6R --> OUT'
-].join('\n');
-
-mmdSources[3] = [
-    'flowchart TD',
-    '    classDef process fill:#E3EBF4,stroke:#9FB6D3,stroke-width:1.5px,color:#13202F',
-    '    classDef output fill:#E2EFE6,stroke:#9CC3A8,stroke-width:1.5px,color:#13202F',
-    '    classDef note fill:#FAF8F4,stroke:#BDB6A8,stroke-width:1px,color:#5D6B7A',
-    '',
-    '    IN[/"Investment Policy Framework"/]:::output',
-    '    IN --> C1',
-    '    C1["3.1 Eligible Asset Classes"]:::process',
-    '    C2["3.2 Instruments, Vehicles, Deal Types"]:::process',
-    '    C3["3.3 Markets, Geographies, Sourcing"]:::process',
-    '    C4["3.4 Eligible Strategies"]:::process',
-    '    C5["3.5 Formalize Universe"]:::output',
-    '    C1 --> C2 --> C3 --> C4 --> C5',
-    '    C5 --> OUT[/"To Step 4 or Skip to 6"/]:::output',
-    '',
-    '    N1["Novel assets like DeFi may span<br/>multiple categories. Use primary<br/>function with cross-references."]:::note',
-    '    C4 -.- N1'
-].join('\n');
-
-mmdSources[4] = [
-    'flowchart TD',
-    '    classDef process fill:#E3EBF4,stroke:#9FB6D3,stroke-width:1.5px,color:#13202F',
-    '    classDef decision fill:#F6EDD6,stroke:#D9C38A,stroke-width:2px,color:#13202F',
-    '    classDef output fill:#E2EFE6,stroke:#9CC3A8,stroke-width:1.5px,color:#13202F',
-    '    classDef subexp fill:#EBE5F3,stroke:#B7A6D6,stroke-width:1.5px,color:#13202F',
-    '    classDef note fill:#FAF8F4,stroke:#BDB6A8,stroke-width:1px,color:#5D6B7A',
-    '',
-    '    IN[/"Eligible Universe + IPF"/]:::output',
-    '    IN --> DN4',
-    '    DN4{"DN 4.0: Methodology<br/>Type per sleeve"}:::decision',
-    '',
-    '    DN4 -->|"Route X"| RX["Discretionary"]:::process',
-    '    DN4 -->|"Route Y"| RY["Systematic"]:::process',
-    '    DN4 -->|"Route Z"| RZ["Liability-Matching"]:::process',
-    '',
-    '    RX --> D1',
-    '    RY --> D1',
-    '    RZ --> D1',
-    '',
-    '    D1["4.1 Allocation Framework"]:::process',
-    '    D2["4.2 Dynamic Adjustment"]:::process',
-    '    D3["4.3 Selection Criteria"]:::process',
-    '    D4["4.4 Formalize Model"]:::output',
-    '    D1 --> D2 --> D3 --> D4',
-    '',
-    '    D3 -.->|"Route X Illiquid"| D31',
-    '    subgraph SUB["4.3 DEAL PROCESS"]',
-    '        D31["4.3.1 Origination"]:::subexp',
-    '        D32["4.3.2 Screening"]:::subexp',
-    '        D33["4.3.3 Preliminary DD"]:::subexp',
-    '        D34["4.3.4 Detailed DD"]:::subexp',
-    '        D35["4.3.5 Valuation"]:::subexp',
-    '        D36["4.3.6 IC Approval"]:::subexp',
-    '        D37["4.3.7 Negotiation"]:::subexp',
-    '        D31 --> D32 --> D33 --> D34 --> D35 --> D36 --> D37',
-    '    end',
-    '',
-    '    D4 --> OUT[/"To Step 5"/]:::output',
-    '    N1["Mixed-methodology funds: multiple<br/>sleeves with different routes"]:::note',
-    '    DN4 -.- N1'
-].join('\n');
-
-mmdSources[5] = [
-    'flowchart TD',
-    '    classDef process fill:#E3EBF4,stroke:#9FB6D3,stroke-width:1.5px,color:#13202F',
-    '    classDef output fill:#E2EFE6,stroke:#9CC3A8,stroke-width:1.5px,color:#13202F',
-    '    classDef mode fill:#F5E6EE,stroke:#D4A9BF,stroke-width:1px,color:#13202F',
-    '    classDef note fill:#FAF8F4,stroke:#BDB6A8,stroke-width:1px,color:#5D6B7A',
-    '',
-    '    IN[/"Allocation Model"/]:::output',
-    '    M1["Single-Event: liquid"]:::mode',
-    '    M2["Iterative: illiquid/deal"]:::mode',
-    '    M3["Continuous: systematic"]:::mode',
-    '    IN --> M1 & M2 & M3',
-    '    M1 & M2 & M3 --> E1',
-    '',
-    '    E1["5.1 Target Allocations"]:::process',
-    '    E2["5.2 Optimize Risk/Return"]:::process',
-    '    E3["5.3 Constraints + Op Risk"]:::process',
-    '    E4["5.4 Stress Test"]:::process',
-    '    E5["5.5 Finalize Target"]:::output',
-    '    E1 --> E2 --> E3 --> E4 --> E5',
-    '    E5 --> OUT[/"To Step 6"/]:::output',
-    '',
-    '    N1["Transitional states: committed<br/>under construction, ramp-up,<br/>stabilized, exit"]:::note',
-    '    E5 -.- N1'
-].join('\n');
-
-mmdSources[6] = [
-    'flowchart TD',
-    '    classDef process fill:#E3EBF4,stroke:#9FB6D3,stroke-width:1.5px,color:#13202F',
-    '    classDef output fill:#E2EFE6,stroke:#9CC3A8,stroke-width:1.5px,color:#13202F',
-    '    classDef variant fill:#F1F7F2,stroke:#9CC3A8,stroke-width:1px,color:#13202F',
-    '',
-    '    IN[/"Target Portfolio"/]:::output',
-    '    IN --> F1',
-    '    F1["6.1 Execution Strategy"]:::process',
-    '    F2["6.2 Manage Execution"]:::process',
-    '    F3["6.3 Confirm + Reconcile"]:::process',
-    '    F4["6.4 Finalize Live Portfolio"]:::output',
-    '    F1 --> F2 --> F3 --> F4',
-    '',
-    '    V1["Liquid: orders, algos,<br/>dark pool routing"]:::variant',
-    '    V2["Illiquid: signing, funding,<br/>capital calls"]:::variant',
-    '    V3["Novel: on-chain tx,<br/>gas, MEV, protocol"]:::variant',
-    '    V4["Route E: Hold.<br/>No action unless triggered"]:::variant',
-    '',
-    '    F1 -.- V1',
-    '    F2 -.- V2',
-    '    F2 -.- V3',
-    '    F1 -.- V4',
-    '    F4 --> OUT[/"To Step 7"/]:::output'
-].join('\n');
-
-mmdSources[7] = [
-    'flowchart TD',
-    '    classDef process fill:#E3EBF4,stroke:#9FB6D3,stroke-width:1.5px,color:#13202F',
-    '    classDef output fill:#E2EFE6,stroke:#9CC3A8,stroke-width:1.5px,color:#13202F',
-    '    classDef feedback fill:#FBF0EE,stroke:#DDAFA5,stroke-width:1.5px,color:#5C1F16',
-    '    classDef decision fill:#F6EDD6,stroke:#D9C38A,stroke-width:2px,color:#13202F',
-    '',
-    '    IN[/"Live Portfolio"/]:::output',
-    '    IN --> G1',
-    '    G1["7.1 Track Performance"]:::process',
-    '    G2["7.2 Attribution Analysis"]:::process',
-    '    G3["7.3 Reassess Conditions"]:::process',
-    '    G4{"7.4 Adjustment<br/>Decision"}:::decision',
-    '    G5["7.5 Report to Stakeholders"]:::output',
-    '',
-    '    G1 --> G2 --> G3 --> G4',
-    '    G4 -->|"No change"| G5',
-    '    G4 -->|"Routine"| FB1["Back to Step 5"]:::feedback',
-    '    G4 -->|"Significant"| FB2["Back to Step 4"]:::feedback',
-    '    G4 -->|"Fundamental"| FB3["Back to Step 1"]:::feedback',
-    '    G5 --> ENDSTATE(["END / NEXT CYCLE"]):::output'
-].join('\n');
-
-/* ============================================
-   BLOCK 4: COPY SOURCE (uses mmdSources only)
-   ============================================ */
-function copySource(idx) {
-    try {
-        if (!mmdSources[idx]) return;
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(mmdSources[idx]);
-        }
-    } catch(e) { console.error('Copy error:', e); }
-}
-
-/* ============================================
-   BLOCK 5: MERMAID LOADING (fully isolated)
-   Fallback: shows source code if CDN blocked
-   ============================================ */
-(function() {
-    var targets = [
-        'dw-overview', 'dw-s1', 'dw-s2', 'dw-s3',
-        'dw-s4', 'dw-s5', 'dw-s6', 'dw-s7'
-    ];
-
-    targets.forEach(function(id) {
-        var el = document.getElementById(id);
-        if (el) el.innerHTML = '<div class="diagram-loading">Loading diagram...</div>';
-    });
-
-    function showFallback(msg) {
-        targets.forEach(function(id, idx) {
-            var el = document.getElementById(id);
-            if (!el || !mmdSources[idx]) return;
-            var escaped = mmdSources[idx].replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-            el.innerHTML = '<div class="mermaid-source-label">' + msg + '</div><pre class="mermaid-source">' + escaped + '</pre>';
-        });
-    }
-
-    try {
-        var script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js';
-        script.onload = function() {
-            try {
-                mermaid.initialize({
-                    startOnLoad: false,
-                    theme: 'base',
-                    themeVariables: {
-                        primaryColor: '#E3EBF4',
-                        primaryBorderColor: '#9FB6D3',
-                        primaryTextColor: '#13202F',
-                        lineColor: '#8E897E',
-                        secondaryColor: '#FAF8F4',
-                        tertiaryColor: '#FAF8F4',
-                        clusterBkg: '#FAF8F4',
-                        clusterBorder: '#E6E1D8',
-                        edgeLabelBackground: '#FFFFFF',
-                        tertiaryTextColor: '#5D6B7A',
-                        fontSize: '13px',
-                        fontFamily: 'Inter, system-ui, -apple-system, Segoe UI, sans-serif'
-                    },
-                    flowchart: { curve: 'basis', padding: 16, htmlLabels: true }
-                });
-                var fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
-                fontsReady.then(function() { targets.forEach(function(id, idx) {
-                    try {
-                        var el = document.getElementById(id);
-                        if (!el || !mmdSources[idx]) return;
-                        mermaid.render('mmd-' + idx, mmdSources[idx]).then(function(result) {
-                            el.innerHTML = result.svg;
-                        }).catch(function(err) {
-                            var escaped = mmdSources[idx].replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-                            el.innerHTML = '<div class="mermaid-source-label">Render error. Source (paste into mermaid.live):</div><pre class="mermaid-source">' + escaped + '</pre>';
-                        });
-                    } catch(e) { console.error('Render error ' + idx, e); }
-                }); });
-            } catch(initErr) {
-                console.error('Mermaid init error:', initErr);
-                showFallback('Mermaid init failed. Source (paste into mermaid.live):');
-            }
-        };
-        script.onerror = function() {
-            showFallback('Mermaid CDN unavailable in this environment. Source (paste into mermaid.live):');
-        };
-        document.body.appendChild(script);
-    } catch(e) {
-        console.error('Script load error:', e);
-        showFallback('Script load error. Source:');
-    }
-})();
+mermaid.initialize({ startOnLoad:false, theme:'base', securityLevel:'loose',
+  flowchart:{ htmlLabels:true, curve:'basis', nodeSpacing:28, rankSpacing:34, padding:12 },
+  themeVariables:{ fontFamily:'Inter, system-ui, sans-serif', fontSize:'13px', lineColor:'#A59F92', primaryTextColor:'#13202F', edgeLabelBackground:'#FFFFFF', tertiaryTextColor:'#5D6B7A' } });
+(document.fonts ? document.fonts.ready : Promise.resolve()).then(()=>mermaid.run({ querySelector:'.mermaid' }));
+const links=[...document.querySelectorAll('aside.toc a')]; const map=new Map(links.map(a=>[a.getAttribute('href').slice(1),a]));
+const io=new IntersectionObserver(es=>{ es.forEach(e=>{ if(e.isIntersecting){ links.forEach(l=>l.classList.remove('on')); const a=map.get(e.target.id); if(a) a.classList.add('on'); } }); },{ rootMargin:'-20% 0px -70% 0px' });
+document.querySelectorAll('section[id], #top').forEach(s=>io.observe(s));
 </script>
-</body>
-</html>
+</body></html>
